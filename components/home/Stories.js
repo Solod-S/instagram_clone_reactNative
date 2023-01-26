@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+
 import USERS from "../../data/users";
 
 const Stories = () => {
@@ -28,7 +29,6 @@ const Stories = () => {
   );
 };
 
-export default Stories;
 const styles = StyleSheet.create({
   container: {
     marginBottom: 15,
@@ -49,3 +49,5 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
 });
+
+export default Stories;

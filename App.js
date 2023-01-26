@@ -1,15 +1,5 @@
-import { StyleSheet, Text, View, SafeAreaView } from "react-native";
-import HomeScreen from "./screens/HomeScreen";
+import SignedInStack from "./navigation";
 
 export default function App() {
-  return <HomeScreen />;
+  return <SignedInStack />;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // backgroundColor: "#fff",
-    // alignItems: "center",
-    // justifyContent: "center",
-  },
-});

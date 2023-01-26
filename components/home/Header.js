@@ -1,6 +1,6 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 
-const Header = () => {
+const Header = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <TouchableOpacity>
@@ -10,7 +10,7 @@ const Header = () => {
         />
       </TouchableOpacity>
       <View style={styles.iconContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.push("NewPostScreen")}>
           <Image
             source={require("../../assets/add-icon.png")}
             style={styles.icon}
@@ -36,7 +36,6 @@ const Header = () => {
   );
 };
 
-export default Header;
 const styles = StyleSheet.create({
   container: {
     justifyContent: "space-between",
@@ -75,3 +74,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+export default Header;
