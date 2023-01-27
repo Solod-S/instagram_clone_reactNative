@@ -78,6 +78,7 @@ const FormikPostUploader = ({ navigation }) => {
                   onChangeText={handleChange("caption")}
                   onBlur={handleBlur("caption")}
                   value={values.caption}
+                  // numberOfLines={3}
                 />
               </View>
             </View>
