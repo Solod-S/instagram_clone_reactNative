@@ -2,6 +2,9 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { validate } from "email-validator";
 import { useState } from "react";
+import firebase from "../../firebase/firebase";
+import { auth } from "../../firebase/firebase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   StyleSheet,
@@ -10,7 +13,11 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { async } from "@firebase/util";
 
 const loginFormSchema = yup.object().shape({
   email: yup.string().email().required("An Email is required"),
@@ -23,13 +30,43 @@ const loginFormSchema = yup.object().shape({
 const LoginForm = ({ navigation }) => {
   // const [email] = useState("");
   // const [password] = useState("");
+
+  const updateDataAsyncSt = async (email, password, uid) => {
+    try {
+      const user = {
+        email,
+        password,
+        uid,
+      };
+      await AsyncStorage.mergeItem("UserData", JSON.stringify(user));
+      Alert.alert("Success!", "Your data has been updated.");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onLogin = async (email, password) => {
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+
+      const { uid, displayName, photoURL } = auth.currentUser;
+      updateDataAsyncSt(email, password, uid);
+    } catch (error) {
+      Alert.alert("Oops!..", "Error! Email or password doesn't match!", [
+        { text: "ok", onPress: () => console.log("Ok"), style: "cancel" },
+        { text: "Sign Up", onPress: () => navigation.push("SignupScreen") },
+      ]);
+      // Alert.alert(error.message);
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
       <Formik
         initialValues={{ email: "", password: "" }}
-        onSubmit={(values) => {
-          console.log(values);
-          navigation.push("HomeScreen");
+        onSubmit={async (values) => {
+          await onLogin(values.email, values.password);
+          // navigation.push("HomeScreen");
         }}
         validationSchema={loginFormSchema}
         validateOnMount={true}
@@ -64,6 +101,7 @@ const LoginForm = ({ navigation }) => {
                 onChangeText={handleChange("email")}
                 onBlur={handleBlur("email")}
                 value={values.email}
+                style={styles.text}
               />
             </View>
             {/* {errors.email && (
@@ -93,6 +131,7 @@ const LoginForm = ({ navigation }) => {
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}
+                style={styles.text}
               />
             </View>
             {/* {errors.password && (
@@ -113,7 +152,7 @@ const LoginForm = ({ navigation }) => {
             </TouchableOpacity>
             <View style={styles.signUpContainer}>
               <Text>Don't have an account?</Text>
-              <TouchableOpacity onPress={() => navigation.push("LoginScreen")}>
+              <TouchableOpacity onPress={() => navigation.push("SignupScreen")}>
                 <Text style={{ color: "#6BB0F5" }}> Sign Up</Text>
               </TouchableOpacity>
             </View>
@@ -133,6 +172,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FAFAFA",
     marginBottom: 10,
     borderWidth: 1,
+  },
+  text: {
+    fontSize: 16,
   },
   button: (isValid) => ({
     backgroundColor: isValid ? "#0096F6" : "#9ACAF7",

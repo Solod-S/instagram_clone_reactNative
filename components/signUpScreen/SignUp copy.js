@@ -1,9 +1,11 @@
 import { Formik } from "formik";
 import * as yup from "yup";
 import { validate } from "email-validator";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { collection, addDoc } from "firebase/firestore";
 
-import { authSignUpUser } from "../../redux/auth/authOperation";
+import { fsbase, auth } from "../../firebase/firebase";
 
 import {
   StyleSheet,
@@ -36,21 +38,62 @@ const SignupFormSchema = yup.object().shape({
 });
 
 const SignupForm = ({ navigation }) => {
-  const dispatch = useDispatch();
+  // const [email] = useState("");
+  // const [password] = useState("");
+
+  // const uploadAvatarToServer = async (uid) => {
+  //   try {
+  //     const storage = getStorage();
+  //     const storageRef = ref(storage, `avatarImage/${uid}`);
+
+  //     const image = await getRandomProfilePicture();
+  //     const file = await image.blob();
+
+  //     const uploadPhoto = await uploadBytes(storageRef, file).then(() => {});
+
+  //     const photoUri = await getDownloadURL(ref(storage, `avatarImage/${uid}`))
+  //       .then((url) => {
+  //         return url;
+  //       })
+  //       .catch((error) => {
+  //         console.log(`error.photoUri`, error);
+  //       });
+  //     return photoUri;
+  //   } catch (error) {
+  //     console.log(`uploadAvatarToServer.error`, error);
+  //   }
+  // };
+
+  const getRandomProfilePicture = async () => {
+    const response = await fetch(
+      "https://randomuser.me/api/0.4/?lego&randomapi&results=1"
+    );
+    const data = await response.json();
+    console.log(data.results[0].user.picture);
+    return data.results[0].user.picture;
+  };
 
   const onSignup = async (login, email, password) => {
     try {
-      const newUser = {
-        avatarImage: null,
-        login,
-        email,
-        password,
-        password,
-      };
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+      const randomPhoto = await getRandomProfilePicture();
 
-      dispatch(authSignUpUser(newUser));
+      const { uid } = auth.currentUser;
+
+      await updateProfile(auth.currentUser, {
+        displayName: login,
+        photoURL: randomPhoto,
+      });
+
+      await addDoc(collection(fsbase, "users"), {
+        owner_uid: uid,
+        username: login,
+        email,
+        profile_picture: randomPhoto,
+      });
     } catch (error) {
       Alert.alert("Oops...something went wrong, please try again later");
+      // Alert.alert(error.message);
     }
   };
 

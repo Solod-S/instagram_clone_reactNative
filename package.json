@@ -31,6 +31,7 @@
     "native": "^0.3.3",
     "react": "^18.1.0",
     "react-native": "0.70.5",
+    "react-native-animated-loader": "^1.0.0",
     "react-native-async-storage": "^0.0.1",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-get-random-values": "^1.8.0",

@@ -1,4 +1,3 @@
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import NewPostScreen from "./screens/NewPostScreen";
@@ -13,18 +12,23 @@ const screenOption = {
 
 const SignedInStack = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="SignupScreen"
-        screenOptions={screenOption}
-      >
-        <Stack.Screen name="HomeScreen" component={HomeScreen} />
-        <Stack.Screen name="NewPostScreen" component={NewPostScreen} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen name="SignupScreen" component={SignupScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator initialRouteName="HomeScreen" screenOptions={screenOption}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="NewPostScreen" component={NewPostScreen} />
+    </Stack.Navigator>
   );
 };
 
-export default SignedInStack;
+const SignedOutStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="LoginScreen"
+      screenOptions={screenOption}
+    >
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="SignupScreen" component={SignupScreen} />
+    </Stack.Navigator>
+  );
+};
+
+export { SignedInStack, SignedOutStack };
