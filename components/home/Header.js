@@ -1,9 +1,14 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { useDispatch } from "react-redux";
+
+import { authSignOutUser } from "../../redux/auth/authOperation";
 
 const Header = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => dispatch(authSignOutUser())}>
         <Image
           style={styles.logo}
           source={require("../../assets/header-logo.png")}

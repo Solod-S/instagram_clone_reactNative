@@ -1,27 +1,17 @@
-import { Formik } from "formik";
-import * as yup from "yup";
-import { validate } from "email-validator";
-import { useDispatch } from "react-redux";
-
-import { authSignUpUser } from "../../redux/auth/authOperation";
-
 import {
   StyleSheet,
   View,
-  Pressable,
   TextInput,
   Text,
   TouchableOpacity,
   Alert,
 } from "react-native";
+import { useDispatch } from "react-redux";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { validate } from "email-validator";
 
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
+import { authSignUpUser } from "../../redux/auth/authOperation";
 
 const SignupFormSchema = yup.object().shape({
   email: yup.string().email().required("An Email is required"),
@@ -44,7 +34,6 @@ const SignupForm = ({ navigation }) => {
         avatarImage: null,
         login,
         email,
-        password,
         password,
       };
 
