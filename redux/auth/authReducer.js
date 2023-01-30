@@ -14,10 +14,10 @@ export const authSlice = createSlice({
   reducers: {
     updateUserProfile: (state, { payload }) => ({
       ...state,
-      owner_uid: payload.uid,
-      username: payload.randomPhoto,
+      owner_uid: payload.owner_uid,
+      username: payload.login,
       email: payload.email,
-      profile_picture: payload.randomPhoto,
+      profile_picture: payload.profile_picture,
     }),
     authStateChange: (state, { payload }) => ({
       ...state,

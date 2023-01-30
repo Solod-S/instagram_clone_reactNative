@@ -1,17 +1,51 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
 import { Divider } from "@rneui/themed";
+import { fsbase } from "../../firebase/firebase";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+import {
+  doc,
+  collection,
+  collectionGroup,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  updateDoc,
+  increment,
+  getFirestore,
+} from "firebase/firestore";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
 const Post = ({ post }) => {
-  const { profile_picture, user, postImage, likes, caption, comments } = post;
+  const currenUser = useSelector((state) => state.auth.owner_uid);
+
+  const {
+    profile_picture,
+    user,
+    postImage,
+    likes,
+    caption,
+    comments,
+    liked_users,
+    postIdTemp,
+    userIdTemp,
+  } = post;
+
   return (
     <View style={styles.postContainer}>
       <Divider width={1} orientation="vertical" />
       <PostHeader profile_picture={profile_picture} user={user} />
       <PostImage postImage={postImage} />
       <View style={{ marginHorizontal: 15 }}>
-        <PostFooter />
+        <PostFooter
+          liked_users={liked_users}
+          currenUser={currenUser}
+          postIdTemp={postIdTemp}
+          userIdTemp={userIdTemp}
+        />
         <Likes likes={likes} />
         <Caption user={user} caption={caption} />
         <CommentSection comments={comments} />
@@ -24,7 +58,7 @@ const Post = ({ post }) => {
 const PostHeader = ({ profile_picture, user }) => (
   <View style={styles.postHeaderContainer}>
     <TouchableOpacity style={styles.postHeaderLink}>
-      <Image source={profile_picture} style={styles.postHeaderImg} />
+      <Image source={{ uri: profile_picture }} style={styles.postHeaderImg} />
       <Text style={styles.postHeaderText}>{user.toLowerCase()}</Text>
     </TouchableOpacity>
 
@@ -36,47 +70,77 @@ const PostHeader = ({ profile_picture, user }) => (
 
 const PostImage = ({ postImage }) => (
   <View style={{ width: "100%", height: 450, marginBottom: 10 }}>
-    <Image source={postImage} style={styles.postImage} />
+    <Image source={{ uri: postImage }} style={styles.postImage} />
   </View>
 );
 
-const PostFooter = () => (
-  <View style={{ flexDirection: "row", marginBottom: 5 }}>
-    <View style={styles.postFooterLeftContainer}>
-      <View style={{ height: 25, width: 25 }}>
-        <Icon
-          imgStyle={styles.postFooterIcon}
-          imgUrl={postFooterIcons[0].image}
-        />
-      </View>
-      <View style={{ height: 25, width: 25 }}>
-        <Icon
-          imgStyle={styles.postFooterIcon}
-          imgUrl={postFooterIcons[1].image}
-        />
-      </View>
-      <View style={{ height: 25, width: 25 }}>
-        <Icon
-          imgStyle={styles.postFooterIcon}
-          imgUrl={postFooterIcons[2].image}
-        />
-      </View>
+const PostFooter = ({ liked_users, currenUser, postIdTemp, userIdTemp }) => {
+  const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
+    const dbRef = doc(fsbase, `users/${userIdTemp}/posts/${postIdTemp}`);
+    const postsDetails = await getDoc(dbRef);
+    const currentData = postsDetails.data();
+    const alreadyLiked = currentData.liked_users.includes(currenUser);
+
+    if (!alreadyLiked) {
+      const db = getFirestore();
+      await updateDoc(dbRef, {
+        likes: increment(1),
+        liked_users: firebase.firestore.FieldValue.arrayUnion(currenUser),
+      });
+    } else {
+      const db = getFirestore();
+      await updateDoc(dbRef, {
+        likes: increment(-1),
+        liked_users: firebase.firestore.FieldValue.arrayRemove(currenUser),
+      });
+    }
+  };
+
+  return (
+    <View style={{ flexDirection: "row", marginBottom: 5 }}>
+      <TouchableOpacity style={styles.postFooterLeftContainer}>
+        <TouchableOpacity
+          style={{ height: 25, width: 25 }}
+          onPress={() => handleLike(currenUser, postIdTemp, userIdTemp)}
+        >
+          <Icon
+            imgStyle={styles.postFooterIcon}
+            imgUrl={
+              !liked_users.includes(currenUser)
+                ? postFooterIcons[0].image
+                : postFooterIcons[0].imageActive
+            }
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ height: 25, width: 25 }}>
+          <Icon
+            imgStyle={styles.postFooterIcon}
+            imgUrl={postFooterIcons[1].image}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={{ height: 25, width: 25 }}>
+          <Icon
+            imgStyle={styles.postFooterIcon}
+            imgUrl={postFooterIcons[2].image}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.postFooterRightContainer}>
+        <TouchableOpacity style={{ height: 25, width: 25 }}>
+          <Icon
+            imgStyle={styles.postFooterIcon}
+            imgUrl={postFooterIcons[3].image}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
     </View>
-    <View style={styles.postFooterRightContainer}>
-      <View style={{ height: 25, width: 25 }}>
-        <Icon
-          imgStyle={styles.postFooterIcon}
-          imgUrl={postFooterIcons[3].image}
-        />
-      </View>
-    </View>
-  </View>
-);
+  );
+};
 
 const Icon = ({ imgStyle, imgUrl }) => (
-  <TouchableOpacity>
+  <View>
     <Image style={imgStyle} source={imgUrl} />
-  </TouchableOpacity>
+  </View>
 );
 
 const Likes = ({ likes }) => (
@@ -106,8 +170,8 @@ const CommentSection = ({ comments }) => (
 const Comments = ({ comments }) => {
   return (
     <>
-      {comments.map(({ user, userId, comment }) => (
-        <View key={userId} style={{ flexDirection: "row", marginBottom: 2 }}>
+      {comments.map(({ user, commentId, comment }) => (
+        <View key={commentId} style={{ flexDirection: "row", marginBottom: 2 }}>
           <Text style={{ color: "white" }}>
             <Text style={{ fontWeight: "600" }}>{user}:</Text>
             <Text style={{ color: "whitesmoke" }}> {comment}</Text>

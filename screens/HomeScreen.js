@@ -2,18 +2,15 @@ import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
 import { fsbase } from "../firebase/firebase";
 import {
   collection,
-  addDoc,
-  doc,
-  onSnapshot,
-  getFirestore,
-  updateDoc,
-  increment,
+  collectionGroup,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
-import { collectionGroup, query, where, getDocs } from "firebase/firestore";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { posts } from "../data/posts";
+// import { posts } from "../data/posts";
 import { bottomTabIcons } from "../data/bottomTabsIcons";
 
 import SafeViewAndroid from "../components/SafeViewAndroid";
@@ -22,30 +19,70 @@ import Stories from "../components/home/Stories";
 import Post from "../components/home/Post";
 import BottomTabs from "../components/home/BottomTabs";
 
-const getPosts = async () => {
-  const q = query(collection(fsbase, "users"));
-  const snapshot = await getDocs(q);
-  const data = snapshot.docs.map((doc) => ({
-    ...doc.data(),
-    id: doc.id,
-  }));
-  // console.log(data, "users");
-
-  data.map(async (elem) => {
-    const posts = query(collection(fsbase, `users/${elem.id}/posts`));
-    const postsDetails = await getDocs(posts);
-    const postsInfo = postsDetails.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-    console.log(postsInfo);
-  });
-};
-
 const HomeScreen = ({ navigation }) => {
+  const [posts, setPosts] = useState([]);
+
   useEffect(() => {
-    getData();
-  }, []);
+    const handlePostsAndComments = async () => {
+      const q = query(collection(fsbase, "users"));
+      const snapshot = await getDocs(q);
+      const users = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        userIdTemp: doc.id,
+      }));
+
+      const postByOne = await Promise.all(
+        users.map(async (elem) => {
+          const posts = query(
+            collection(fsbase, `users/${elem.userIdTemp}/posts`)
+          );
+
+          const postsDetails = await getDocs(posts);
+
+          const postsInfo = postsDetails.docs.map((doc) => ({
+            ...doc.data(),
+            postIdTemp: doc.id,
+            userIdTemp: elem.userIdTemp,
+          }));
+          return postsInfo;
+        })
+      );
+
+      const allPosts = [];
+
+      for (const post of postByOne) {
+        allPosts.push(...post);
+      }
+
+      const commentsAndPosts = await Promise.all(
+        allPosts.map(async (el) => {
+          const commetns = query(
+            collection(
+              fsbase,
+              `users/${el.userIdTemp}/posts/${el.postIdTemp}/comments`
+            )
+          );
+
+          const commetnsDetails = await getDocs(commetns);
+          const commetnsInfo = commetnsDetails.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+          }));
+
+          return { ...el, comments: commetnsInfo };
+        })
+      );
+
+      setPosts(commentsAndPosts);
+    };
+
+    try {
+      handlePostsAndComments();
+    } catch (error) {
+      console.log(error);
+    }
+  }, [posts]);
+
   return (
     <SafeAreaView
       style={{
@@ -57,7 +94,7 @@ const HomeScreen = ({ navigation }) => {
       <Stories />
       <ScrollView style={{ marginBottom: 50 }}>
         {posts.length > 0 &&
-          posts.map((post) => <Post key={post.id} post={post} />)}
+          posts.map((post) => <Post key={post.postIdTemp} post={post} />)}
       </ScrollView>
       <BottomTabs icons={bottomTabIcons} />
     </SafeAreaView>

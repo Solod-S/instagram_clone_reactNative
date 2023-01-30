@@ -63,6 +63,8 @@ export const authSignInUser =
 
       const { uid, displayName, photoURL } = auth.currentUser;
 
+      console.log(uid, displayName, photoURL);
+
       dispatch(
         updateUserProfile({
           owner_uid: uid,
@@ -96,7 +98,7 @@ export const authStateChangeUsers = () => async (dispatch) => {
           email: user.email,
           profile_picture: user.photoURL,
           login: user.displayName,
-          userId: user.uid,
+          owner_uid: user.uid,
         };
 
         dispatch(updateUserProfile(userUpdateProfile));
