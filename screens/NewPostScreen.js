@@ -1,4 +1,4 @@
-import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native";
 
 import SafeViewAndroid from "../components/SafeViewAndroid";
 import AddNewPost from "../components/newPost/AddNewPost";
@@ -15,10 +15,3 @@ const NewPostScreen = ({ navigation }) => (
 );
 
 export default NewPostScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    flex: 1,
-  },
-});

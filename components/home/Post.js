@@ -1,25 +1,11 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import { Divider } from "@rneui/themed";
-import { fsbase } from "../../firebase/firebase";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import {
-  doc,
-  collection,
-  collectionGroup,
-  query,
-  where,
-  getDocs,
-  getDoc,
-  updateDoc,
-  increment,
-  getFirestore,
-} from "firebase/firestore";
+import { handleLike } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post }) => {
+const Post = ({ post, navigation, setRefresh }) => {
   const currenUser = useSelector((state) => state.auth.owner_uid);
 
   const {
@@ -41,10 +27,10 @@ const Post = ({ post }) => {
       <PostImage postImage={postImage} />
       <View style={{ marginHorizontal: 15 }}>
         <PostFooter
-          liked_users={liked_users}
           currenUser={currenUser}
-          postIdTemp={postIdTemp}
-          userIdTemp={userIdTemp}
+          navigation={navigation}
+          post={post}
+          setRefresh={setRefresh}
         />
         <Likes likes={likes} />
         <Caption user={user} caption={caption} />
@@ -74,34 +60,21 @@ const PostImage = ({ postImage }) => (
   </View>
 );
 
-const PostFooter = ({ liked_users, currenUser, postIdTemp, userIdTemp }) => {
-  const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
-    const dbRef = doc(fsbase, `users/${userIdTemp}/posts/${postIdTemp}`);
-    const postsDetails = await getDoc(dbRef);
-    const currentData = postsDetails.data();
-    const alreadyLiked = currentData.liked_users.includes(currenUser);
-
-    if (!alreadyLiked) {
-      const db = getFirestore();
-      await updateDoc(dbRef, {
-        likes: increment(1),
-        liked_users: firebase.firestore.FieldValue.arrayUnion(currenUser),
-      });
-    } else {
-      const db = getFirestore();
-      await updateDoc(dbRef, {
-        likes: increment(-1),
-        liked_users: firebase.firestore.FieldValue.arrayRemove(currenUser),
-      });
-    }
-  };
-
+const PostFooter = ({ post, currenUser, navigation, setRefresh }) => {
+  const { liked_users, postIdTemp, userIdTemp } = post;
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <TouchableOpacity style={styles.postFooterLeftContainer}>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
-          onPress={() => handleLike(currenUser, postIdTemp, userIdTemp)}
+          onPress={async () => {
+            const alreadyLiked = await handleLike(
+              currenUser,
+              postIdTemp,
+              userIdTemp
+            );
+            setRefresh(true);
+          }}
         >
           <Icon
             imgStyle={styles.postFooterIcon}
@@ -112,7 +85,10 @@ const PostFooter = ({ liked_users, currenUser, postIdTemp, userIdTemp }) => {
             }
           />
         </TouchableOpacity>
-        <TouchableOpacity style={{ height: 25, width: 25 }}>
+        <TouchableOpacity
+          style={{ height: 25, width: 25 }}
+          onPress={() => navigation.push("NewCommentScreen", { post })}
+        >
           <Icon
             imgStyle={styles.postFooterIcon}
             imgUrl={postFooterIcons[1].image}
@@ -138,7 +114,7 @@ const PostFooter = ({ liked_users, currenUser, postIdTemp, userIdTemp }) => {
 };
 
 const Icon = ({ imgStyle, imgUrl }) => (
-  <View>
+  <View style={{ marginRight: 5 }}>
     <Image style={imgStyle} source={imgUrl} />
   </View>
 );

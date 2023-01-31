@@ -1,9 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
 
-import NewPostScreen from "./screens/NewPostScreen";
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
+import NewPostScreen from "./screens/NewPostScreen";
+import NewCommentScreen from "./screens/NewCommentScreen";
 
 const Stack = createStackNavigator();
 const screenOption = {
@@ -15,6 +16,7 @@ const SignedInStack = () => {
     <Stack.Navigator initialRouteName="HomeScreen" screenOptions={screenOption}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="NewPostScreen" component={NewPostScreen} />
+      <Stack.Screen name="NewCommentScreen" component={NewCommentScreen} />
     </Stack.Navigator>
   );
 };

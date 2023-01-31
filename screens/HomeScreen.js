@@ -21,6 +21,7 @@ import BottomTabs from "../components/home/BottomTabs";
 
 const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     const handlePostsAndComments = async () => {
@@ -80,8 +81,10 @@ const HomeScreen = ({ navigation }) => {
       handlePostsAndComments();
     } catch (error) {
       console.log(error);
+    } finally {
+      setRefresh(false);
     }
-  }, [posts]);
+  }, [refresh === true]);
 
   return (
     <SafeAreaView
@@ -94,7 +97,14 @@ const HomeScreen = ({ navigation }) => {
       <Stories />
       <ScrollView style={{ marginBottom: 50 }}>
         {posts.length > 0 &&
-          posts.map((post) => <Post key={post.postIdTemp} post={post} />)}
+          posts.map((post) => (
+            <Post
+              key={post.postIdTemp}
+              post={post}
+              navigation={navigation}
+              setRefresh={setRefresh}
+            />
+          ))}
       </ScrollView>
       <BottomTabs icons={bottomTabIcons} />
     </SafeAreaView>

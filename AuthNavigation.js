@@ -11,7 +11,6 @@ const AuthNavigation = () => {
 
   useEffect(() => {
     dispatch(authStateChangeUsers());
-    console.log(stateChange);
   }, [stateChange]);
 
   return (
