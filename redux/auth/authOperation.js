@@ -8,7 +8,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { fsbase } from "../../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 
 import { authSlice } from "./authReducer";
 const { updateUserProfile, authStateChange, authSignOut } = authSlice.actions;
@@ -35,7 +35,8 @@ export const authSignUpUser =
       console.log(login, email, password);
       const { uid, displayName, photoURL } = auth.currentUser;
 
-      await addDoc(collection(fsbase, "users"), {
+      // await addDoc(collection(fsbase, "users"), {
+      await setDoc(doc(fsbase, "users", email), {
         owner_uid: uid,
         login: login,
         email: email,

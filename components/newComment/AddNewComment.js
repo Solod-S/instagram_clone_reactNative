@@ -9,16 +9,21 @@ import {
 import { useRef } from "react";
 import { Divider } from "@rneui/themed";
 
-import FormikCommentploader from "./FormikCommentploader";
+import FormikCommentUploader from "./FormikCommentUploader";
 
-const AddNewComment = ({ navigation, post }) => {
-  console.log(post);
+const AddNewComment = ({ navigation, comments, post, setComments }) => {
+  const { email, postIdTemp } = post;
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} />
-      <About post={post} />
-      <CommentsList post={post} />
-      <FormikCommentploader />
+      <CommentsList post={post} comments={comments} />
+      <FormikCommentUploader
+        navigation={navigation}
+        userIdTemp={email}
+        postIdTemp={postIdTemp}
+        setComments={setComments}
+      />
     </View>
   );
 };
@@ -52,23 +57,15 @@ const About = ({ post }) => {
       style={{
         flexDirection: "row",
         alignItems: "flex-start",
-        paddingVertical: 10,
+        paddingVertical: 5,
       }}
     >
       <TouchableOpacity style={styles.commentLink}>
         <Image source={{ uri: profile_picture }} style={styles.commentImg} />
       </TouchableOpacity>
-      <View style={{ flex: 1, paddingHorizontal: 0 }}>
-        <View
-          style={{
-            width: "100%",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
-          <Text style={{ color: "white" }}>{user.toLowerCase()}</Text>
+      <View style={{ flex: 1 }}>
+        <View style={styles.infoWrapper}>
+          <Text style={styles.name}>{user.toLowerCase()}</Text>
           <Text style={styles.created}>
             {date} | {time}
           </Text>
@@ -81,11 +78,10 @@ const About = ({ post }) => {
   );
 };
 
-const CommentsList = ({ post }) => {
+const CommentsList = ({ post, comments }) => {
   const scrollRef = useRef(null);
   return (
     <>
-      <Divider width={1} orientation="vertical" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="always"
@@ -93,10 +89,16 @@ const CommentsList = ({ post }) => {
         onContentSizeChange={() =>
           scrollRef.current.scrollToEnd({ animated: true })
         }
-        style={{ marginBottom: 50, paddingHorizontal: 12, paddingTop: 20 }}
+        style={{
+          marginBottom: 60,
+          paddingHorizontal: 12,
+          paddingTop: 10,
+        }}
       >
-        {post.comments.length > 0 &&
-          post.comments.map(
+        <About post={post} />
+        <Divider width={1} orientation="vertical" />
+        {comments.length > 0 &&
+          comments.map(
             ({
               comment,
               commentId,
@@ -139,20 +141,18 @@ const Comment = ({
 }) => {
   // console.log(date.toLocaleDateString());
   return (
-    <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "flex-start",
+        paddingVertical: 15,
+      }}
+    >
       <TouchableOpacity style={styles.commentLink}>
         <Image source={{ uri: profile_picture }} style={styles.commentImg} />
       </TouchableOpacity>
       <View style={{ flex: 1, paddingHorizontal: 5 }}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 2,
-          }}
-        >
+        <View style={styles.infoWrapper}>
           <Text style={styles.name}>{user.toLowerCase()}</Text>
           <Text style={styles.created}>
             {date} | {time}
@@ -168,12 +168,13 @@ const Comment = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 10,
+    flex: 1,
   },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 3,
   },
   headerText: {
     color: "#fff",
@@ -190,10 +191,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ff8501",
   },
+  infoWrapper: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 2,
+  },
   name: {
     color: "white",
-    fontSize: 18,
-    fontWeight: "900",
   },
   created: {
     color: "gray",

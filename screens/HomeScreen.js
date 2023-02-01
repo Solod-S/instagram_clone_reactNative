@@ -1,90 +1,53 @@
 import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
-import { fsbase } from "../firebase/firebase";
-import {
-  collection,
-  collectionGroup,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-
 import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-// import { posts } from "../data/posts";
-import { bottomTabIcons } from "../data/bottomTabsIcons";
+import { fsbase } from "../firebase/firebase";
+import { collectionGroup, query, getDocs } from "firebase/firestore";
+
+import { stopUpdatingApp } from "../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../components/SafeViewAndroid";
 import Header from "../components/home/Header";
 import Stories from "../components/home/Stories";
 import Post from "../components/home/Post";
 import BottomTabs from "../components/home/BottomTabs";
+import { bottomTabIcons } from "../data/bottomTabsIcons";
 
 const HomeScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
-  const [refresh, setRefresh] = useState(false);
+  const { status } = useSelector((state) => state.appUpdate);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    const handlePostsAndComments = async () => {
-      const q = query(collection(fsbase, "users"));
+    const fetchComments = async () => {
+      const q = query(collectionGroup(fsbase, "comments"));
       const snapshot = await getDocs(q);
-      const users = snapshot.docs.map((doc) => ({
+      const comments = snapshot.docs.map((doc) => ({
         ...doc.data(),
-        userIdTemp: doc.id,
+        commentIdTemp: doc.id,
       }));
-
-      const postByOne = await Promise.all(
-        users.map(async (elem) => {
-          const posts = query(
-            collection(fsbase, `users/${elem.userIdTemp}/posts`)
-          );
-
-          const postsDetails = await getDocs(posts);
-
-          const postsInfo = postsDetails.docs.map((doc) => ({
-            ...doc.data(),
-            postIdTemp: doc.id,
-            userIdTemp: elem.userIdTemp,
-          }));
-          return postsInfo;
-        })
-      );
-
-      const allPosts = [];
-
-      for (const post of postByOne) {
-        allPosts.push(...post);
-      }
-
-      const commentsAndPosts = await Promise.all(
-        allPosts.map(async (el) => {
-          const commetns = query(
-            collection(
-              fsbase,
-              `users/${el.userIdTemp}/posts/${el.postIdTemp}/comments`
-            )
-          );
-
-          const commetnsDetails = await getDocs(commetns);
-          const commetnsInfo = commetnsDetails.docs.map((doc) => ({
-            ...doc.data(),
-            id: doc.id,
-          }));
-
-          return { ...el, comments: commetnsInfo };
-        })
-      );
-
-      setPosts(commentsAndPosts);
+      console.log(`comments`, comments);
     };
 
+    const fetchPosts = async () => {
+      const q = query(collectionGroup(fsbase, "posts"));
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        postIdTemp: doc.id,
+      }));
+      // console.log(posts);
+      setPosts(posts);
+    };
     try {
-      handlePostsAndComments();
+      fetchPosts();
     } catch (error) {
       console.log(error);
     } finally {
-      setRefresh(false);
+      dispatch(stopUpdatingApp());
     }
-  }, [refresh === true]);
+  }, [status === true]);
 
   return (
     <SafeAreaView
@@ -98,14 +61,10 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView style={{ marginBottom: 50 }}>
         {posts.length > 0 &&
           posts.map((post) => (
-            <Post
-              key={post.postIdTemp}
-              post={post}
-              navigation={navigation}
-              setRefresh={setRefresh}
-            />
+            <Post key={post.postId} post={post} navigation={navigation} />
           ))}
       </ScrollView>
+
       <BottomTabs icons={bottomTabIcons} />
     </SafeAreaView>
   );

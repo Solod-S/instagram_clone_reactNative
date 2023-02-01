@@ -1,24 +1,49 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "@rneui/themed";
+
+import { fsbase } from "../../firebase/firebase";
+
+import { collection, query, getDocs } from "firebase/firestore";
+import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
+
 import { handleLike } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, setRefresh }) => {
+const Post = ({ post, navigation }) => {
   const currenUser = useSelector((state) => state.auth.owner_uid);
+  const [comments, setComments] = useState([]);
 
   const {
     profile_picture,
+    email,
     user,
     postImage,
     likes,
     caption,
-    comments,
-    liked_users,
     postIdTemp,
-    userIdTemp,
   } = post;
+
+  useEffect(() => {
+    const fetchComments = async (email, postIdTemp) => {
+      const q = query(
+        collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
+      );
+      const snapshot = await getDocs(q);
+      const comments = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        commentIdTemp: doc.id,
+      }));
+      setComments(comments);
+    };
+    try {
+      fetchComments(email, postIdTemp);
+    } catch (error) {
+      console.log(`fetchComments.error`, error);
+    }
+  }, [post]);
 
   return (
     <View style={styles.postContainer}>
@@ -30,11 +55,15 @@ const Post = ({ post, navigation, setRefresh }) => {
           currenUser={currenUser}
           navigation={navigation}
           post={post}
-          setRefresh={setRefresh}
+          comments={comments}
         />
         <Likes likes={likes} />
         <Caption user={user} caption={caption} />
-        <CommentSection comments={comments} />
+        <CommentSection
+          comments={comments}
+          navigation={navigation}
+          post={post}
+        />
         <Comments comments={comments} />
       </View>
     </View>
@@ -60,20 +89,18 @@ const PostImage = ({ postImage }) => (
   </View>
 );
 
-const PostFooter = ({ post, currenUser, navigation, setRefresh }) => {
-  const { liked_users, postIdTemp, userIdTemp } = post;
+const PostFooter = ({ post, currenUser, navigation, comments }) => {
+  const dispatch = useDispatch();
+  const { liked_users, postIdTemp, email } = post;
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <TouchableOpacity style={styles.postFooterLeftContainer}>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
           onPress={async () => {
-            const alreadyLiked = await handleLike(
-              currenUser,
-              postIdTemp,
-              userIdTemp
-            );
-            setRefresh(true);
+            await handleLike(currenUser, postIdTemp, email);
+            dispatch(startUpdatingApp());
+            // setRefresh(true);
           }}
         >
           <Icon
@@ -87,7 +114,9 @@ const PostFooter = ({ post, currenUser, navigation, setRefresh }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
-          onPress={() => navigation.push("NewCommentScreen", { post })}
+          onPress={() =>
+            navigation.push("NewCommentScreen", { comments, post })
+          }
         >
           <Icon
             imgStyle={styles.postFooterIcon}
@@ -132,28 +161,43 @@ const Caption = ({ user, caption }) => (
   </Text>
 );
 
-const CommentSection = ({ comments }) => (
-  <>
-    {!!comments.length && (
-      <Text style={{ color: "grey" }}>
-        View{comments.length > 1 ? " all" : ""} {comments.length}{" "}
-        {comments.length > 1 ? "comments" : "comment"}
-      </Text>
-    )}
-  </>
-);
-
+const CommentSection = ({ navigation, comments, post }) => {
+  return (
+    <>
+      {!!comments.length && (
+        <TouchableOpacity
+          onPress={() =>
+            navigation.push("NewCommentScreen", { comments, post })
+          }
+        >
+          <Text style={{ color: "grey" }}>
+            View{comments.length > 1 ? " all" : ""} {comments.length}{" "}
+            {comments.length > 1 ? "comments" : "comment"}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </>
+  );
+};
 const Comments = ({ comments }) => {
   return (
     <>
-      {comments.map(({ user, commentId, comment }) => (
-        <View key={commentId} style={{ flexDirection: "row", marginBottom: 2 }}>
-          <Text style={{ color: "white" }}>
-            <Text style={{ fontWeight: "600" }}>{user}:</Text>
-            <Text style={{ color: "whitesmoke" }}> {comment}</Text>
-          </Text>
-        </View>
-      ))}
+      {comments.map(({ user, commentId, comment }, index) => {
+        if (index > 0) {
+          return;
+        }
+        return (
+          <View
+            key={commentId}
+            style={{ flexDirection: "row", marginBottom: 2 }}
+          >
+            <Text style={{ color: "white" }}>
+              <Text style={{ fontWeight: "600" }}>{user}:</Text>
+              <Text style={{ color: "whitesmoke" }}> {comment}</Text>
+            </Text>
+          </View>
+        );
+      })}
     </>
   );
 };

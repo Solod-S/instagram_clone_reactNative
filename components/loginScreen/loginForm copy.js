@@ -28,9 +28,6 @@ const loginFormSchema = yup.object().shape({
 });
 
 const LoginForm = ({ navigation }) => {
-  // const [email] = useState("");
-  // const [password] = useState("");
-
   const updateDataAsyncSt = async (email, password, uid) => {
     try {
       const user = {
