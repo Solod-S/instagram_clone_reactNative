@@ -58,11 +58,16 @@ const HomeScreen = ({ navigation }) => {
     >
       <Header navigation={navigation} />
       <Stories />
-      <ScrollView style={{ marginBottom: 50 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ marginBottom: 50 }}
+      >
         {posts.length > 0 &&
-          posts.map((post) => (
-            <Post key={post.postId} post={post} navigation={navigation} />
-          ))}
+          posts
+            .sort((a, b) => a.created < b.created)
+            .map((post) => (
+              <Post key={post.postId} post={post} navigation={navigation} />
+            ))}
       </ScrollView>
 
       <BottomTabs icons={bottomTabIcons} />

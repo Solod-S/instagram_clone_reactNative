@@ -1,4 +1,11 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import {
+  Text,
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "@rneui/themed";
@@ -83,11 +90,26 @@ const PostHeader = ({ profile_picture, user }) => (
   </View>
 );
 
-const PostImage = ({ postImage }) => (
-  <View style={{ width: "100%", height: 450, marginBottom: 10 }}>
-    <Image source={{ uri: postImage }} style={styles.postImage} />
-  </View>
-);
+const PostImage = ({ postImage }) => {
+  const [dimensions, setdimensions] = useState(Dimensions.get("window").width);
+  useEffect(() => {
+    const onChange = () => {
+      const width = Dimensions.get("window").width - 20 * 2;
+      setdimensions(width);
+    };
+    const dimensionsHandler = Dimensions.addEventListener("change", onChange);
+
+    return () => {
+      dimensionsHandler.remove();
+    };
+  }, []);
+
+  return (
+    <View style={{ width: dimensions, height: dimensions, marginBottom: 10 }}>
+      <Image source={{ uri: postImage }} style={styles.postImage} />
+    </View>
+  );
+};
 
 const PostFooter = ({ post, currenUser, navigation, comments }) => {
   const dispatch = useDispatch();
@@ -182,22 +204,24 @@ const CommentSection = ({ navigation, comments, post }) => {
 const Comments = ({ comments }) => {
   return (
     <>
-      {comments.map(({ user, commentId, comment }, index) => {
-        if (index > 0) {
-          return;
-        }
-        return (
-          <View
-            key={commentId}
-            style={{ flexDirection: "row", marginBottom: 2 }}
-          >
-            <Text style={{ color: "white" }}>
-              <Text style={{ fontWeight: "600" }}>{user}:</Text>
-              <Text style={{ color: "whitesmoke" }}> {comment}</Text>
-            </Text>
-          </View>
-        );
-      })}
+      {comments
+        .sort((a, b) => a.created < b.created)
+        .map(({ user, commentId, comment }, index) => {
+          if (index > 0) {
+            return;
+          }
+          return (
+            <View
+              key={commentId}
+              style={{ flexDirection: "row", marginBottom: 2 }}
+            >
+              <Text style={{ color: "white" }}>
+                <Text style={{ fontWeight: "600" }}>{user}:</Text>
+                <Text style={{ color: "whitesmoke" }}> {comment}</Text>
+              </Text>
+            </View>
+          );
+        })}
     </>
   );
 };

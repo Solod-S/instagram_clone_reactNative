@@ -26,6 +26,8 @@ const Header = ({ navigation }) => (
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
+
+    flex: 1,
   },
   headerContainer: {
     flexDirection: "row",

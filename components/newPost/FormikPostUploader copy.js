@@ -143,118 +143,77 @@ const FormikPostUploader = ({ navigation }) => {
   };
 
   return (
-    <View
-      style={{
-        // height: "100%",
-        flex: 1,
-        position: "relative",
-      }}
-    >
-      {/* <ScrollView> */}
-      <Formik
-        initialValues={{ caption: "" }}
-        onSubmit={async (values) => {
-          await uploadPostToServer(values.caption);
-          setPostImage("");
-          navigation.goBack();
+    <>
+      <ScrollView>
+        <Formik
+          initialValues={{ caption: "" }}
+          onSubmit={async (values) => {
+            await uploadPostToServer(values.caption);
+            setPostImage("");
+            navigation.goBack();
 
-          // console.log(values, postImage), navigation.goBack();
-        }}
-        validationSchema={uploadPostSchema}
-        validateOnMount={true}
-      >
-        {({
-          handleBlur,
-          handleChange,
-          handleSubmit,
-          values,
-          errors,
-          isValid,
-          isSubmitting,
-        }) => (
-          <>
-            <View
-              style={{
-                height: "100%",
-                // flex: 1,
-                // margin: 20,
-                // justifyContent: "space-between",
-                // flexDirection: "column",
-              }}
-            >
-              <TouchableOpacity
-                activeOpacity={0.6}
-                onPress={imageHander}
-                style={{ marginBottom: 10 }}
-              >
-                <Image
-                  source={{
-                    uri: postImage ? postImage : PLACEHOLDERIMG,
-                  }}
-                  style={{
-                    width: dimensions,
-                    height: isKeyboardVisible ? dimensions - 100 : dimensions,
-                    backgroundColor: "white",
-                  }}
-                />
-              </TouchableOpacity>
-
+            // console.log(values, postImage), navigation.goBack();
+          }}
+          validationSchema={uploadPostSchema}
+          validateOnMount={true}
+        >
+          {({
+            handleBlur,
+            handleChange,
+            handleSubmit,
+            values,
+            errors,
+            isValid,
+          }) => (
+            <>
               <View
-                style={{
-                  position: "absolute",
-                  padding: 5,
-                  bottom: 0,
-                  width: "100%",
-                  height: 50,
-                }}
+                style={
+                  {
+                    // flex: 1,
+                    // margin: 20,
+                    // justifyContent: "space-between",
+                    // flexDirection: "column",
+                  }
+                }
               >
-                <Divider width={0.2} orientation="vertical" />
-                <TextInput
-                  placeholder="Write a caption"
-                  placeholderTextColor="gray"
-                  style={{
-                    color: "white",
-                    fontSize: 16,
-                    paddingLeft: 12,
-                    paddingRight: 70,
-                    paddingTop: 6,
-                  }}
-                  multiline={true}
-                  onChangeText={handleChange("caption")}
-                  // onChange={setCaption(values.caption)}
-                  onBlur={handleBlur("caption")}
-                  value={values.caption}
-                  // numberOfLines={3}
-                />
                 <TouchableOpacity
-                  disabled={!isSubmitting && postImage.length === 0}
-                  style={{
-                    width: 100,
-                    alignItems: "center",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    position: "absolute",
-                    right: 0,
-                    top: 12,
-                  }}
-                  onPress={handleSubmit}
+                  activeOpacity={0.6}
+                  onPress={imageHander}
+                  style={{ marginBottom: 10 }}
                 >
-                  <Text
-                    style={{
-                      color:
-                        postImage.length !== 0 && !isSubmitting
-                          ? "white"
-                          : "gray",
-                      fontSize: 18,
+                  <Image
+                    source={{
+                      uri: postImage ? postImage : PLACEHOLDERIMG,
                     }}
-                  >
-                    Send
-                  </Text>
+                    style={{
+                      width: dimensions,
+                      height: isKeyboardVisible ? dimensions - 100 : dimensions,
+                      backgroundColor: "white",
+                    }}
+                  />
                 </TouchableOpacity>
-              </View>
-            </View>
 
-            {/* <TouchableOpacity
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  <TextInput
+                    placeholder="Write a caption"
+                    placeholderTextColor="gray"
+                    style={{ color: "white", fontSize: 18 }}
+                    multiline={true}
+                    onChangeText={handleChange("caption")}
+                    // onChange={setCaption(values.caption)}
+                    onBlur={handleBlur("caption")}
+                    value={values.caption}
+                    // numberOfLines={3}
+                  />
+                </View>
+              </View>
+              <Divider
+                width={0.2}
+                orientation="vertical"
+                style={{ marginBottom: 10 }}
+              />
+
+              <TouchableOpacity
                 // disabled={!isValid}
                 disabled={postImage.length === 0}
                 style={{
@@ -266,12 +225,12 @@ const FormikPostUploader = ({ navigation }) => {
                 onPress={handleSubmit}
               >
                 <Text style={{ color: "white", fontSize: 22 }}>Share</Text>
-              </TouchableOpacity> */}
-          </>
-        )}
-      </Formik>
-      {/* </ScrollView> */}
-    </View>
+              </TouchableOpacity>
+            </>
+          )}
+        </Formik>
+      </ScrollView>
+    </>
   );
 };
 
