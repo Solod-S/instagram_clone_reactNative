@@ -20,16 +20,6 @@ const HomeScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchComments = async () => {
-      const q = query(collectionGroup(fsbase, "comments"));
-      const snapshot = await getDocs(q);
-      const comments = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        commentIdTemp: doc.id,
-      }));
-      console.log(`comments`, comments);
-    };
-
     const fetchPosts = async () => {
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);

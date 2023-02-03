@@ -5,7 +5,10 @@ import {
   updateProfile,
   onAuthStateChanged,
   signOut,
+  sendPasswordResetEmail,
+  getAuth,
 } from "firebase/auth";
+
 import { auth } from "../../firebase/firebase";
 import { fsbase } from "../../firebase/firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
@@ -18,7 +21,7 @@ const getRandomProfilePicture = async () => {
     "https://randomuser.me/api/0.4/?lego&randomapi&results=1"
   );
   const data = await response.json();
-  console.log(data.results[0].user.picture);
+
   return data.results[0].user.picture;
 };
 
@@ -32,7 +35,7 @@ export const authSignUpUser =
         displayName: login,
         photoURL: randomPhoto,
       });
-      console.log(login, email, password);
+
       const { uid, displayName, photoURL } = auth.currentUser;
 
       // await addDoc(collection(fsbase, "users"), {
@@ -64,8 +67,6 @@ export const authSignInUser =
 
       const { uid, displayName, photoURL } = auth.currentUser;
 
-      console.log(uid, displayName, photoURL);
-
       dispatch(
         updateUserProfile({
           owner_uid: uid,
@@ -80,6 +81,22 @@ export const authSignInUser =
         { text: "Sign Up", onPress: () => navigation.push("SignupScreen") },
       ]);
     }
+  };
+
+export const authResetPassword =
+  (email, navigation) => async (dispatch, getState) => {
+    console.log(`email`, email);
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert("Password reset email sent!");
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
   };
 
 export const authSignOutUser = () => async (dispatch, getState) => {

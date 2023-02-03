@@ -19,6 +19,11 @@ export const bottomTabIcons = [
     active: require("../assets/icons/shop_active.png"),
     inactive: require("../assets/icons/shop_inactive.png"),
   },
+  // {
+  //   name: "Profile",
+  //   active: require("../assets/icons/ava.jpg"),
+  //   inactive: require("../assets/icons/ava.jpg"),
+  // },
   {
     name: "Profile",
     active: require("../assets/icons/ava.jpg"),

@@ -10,37 +10,28 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { validate } from "email-validator";
 
-import { authSignInUser } from "../../redux/auth/authOperation";
+import { authResetPassword } from "../../redux/auth/authOperation";
 
-const loginFormSchema = yup.object().shape({
+const resetFormSchema = yup.object().shape({
   email: yup.string().email().required("An Email is required"),
-  password: yup
-    .string()
-    .required()
-    .min(6, "Your password has to have at least 6 characters"),
 });
 
-const LoginForm = ({ navigation }) => {
+const ResetForm = ({ navigation }) => {
   const dispatch = useDispatch();
 
-  const onLogin = async (email, password) => {
-    const user = {
-      email,
-      password,
-      navigation,
-    };
-
-    dispatch(authSignInUser(user));
+  const onReset = async (email, password) => {
+    console.log(email);
+    dispatch(authResetPassword(email));
   };
 
   return (
     <View style={styles.wrapper}>
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{ email: "" }}
         onSubmit={async (values) => {
-          await onLogin(values.email, values.password);
+          await onReset(values.email);
         }}
-        validationSchema={loginFormSchema}
+        validationSchema={resetFormSchema}
         validateOnMount={true}
       >
         {({
@@ -76,53 +67,16 @@ const LoginForm = ({ navigation }) => {
                 style={styles.text}
               />
             </View>
-            {/* {errors.email && (
-              <Text style={{ color: "red", fontSize: 10, marginBottom: 3 }}>
-                {errors.email}
-              </Text>
-            )} */}
-            <View
-              style={[
-                styles.inputField,
-                {
-                  borderColor:
-                    1 > values.password.length || values.password.length > 5
-                      ? "#ccc"
-                      : "red",
-                },
-              ]}
-            >
-              <TextInput
-                placeholderTextColor="#444"
-                placeholder="Password"
-                autoCapitalize="none"
-                autoCorrect={false}
-                secureTextEntry={true}
-                textContentType="password"
-                autoFocus={true}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
-                style={styles.text}
-              />
-            </View>
-            {/* {errors.password && (
-              <Text style={{ color: "red", fontSize: 10 }}>
-                {errors.password}
-              </Text>
-            )} */}
             <View style={{ alignItems: "flex-end", marginBottom: 30 }}>
-              <TouchableOpacity
-                onPress={() => navigation.push("ResetPasswordScreen")}
-              >
-                <Text style={{ color: "#6BB0F5" }}>Forget password?</Text>
+              <TouchableOpacity onPress={() => navigation.push("LoginScreen")}>
+                <Text style={{ color: "#6BB0F5" }}>Remember password?</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.button(isValid)}
               onPress={handleSubmit}
             >
-              <Text style={styles.buttonText}>Log in</Text>
+              <Text style={styles.buttonText}>Resset password</Text>
             </TouchableOpacity>
             <View style={styles.signUpContainer}>
               <Text>Don't have an account?</Text>
@@ -170,4 +124,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginForm;
+export default ResetForm;

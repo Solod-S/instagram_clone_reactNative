@@ -1,33 +1,53 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
-
+import { useDispatch, useSelector } from "react-redux";
 import { authSignOutUser } from "../../redux/auth/authOperation";
 
+import { useState, useEffect } from "react";
+
 const Header = ({ navigation }) => {
+  const [loading, setloading] = useState(false);
+  const { status } = useSelector((state) => state.appUpdate);
   const dispatch = useDispatch();
+
+  const logOut = () => {
+    setloading(true);
+    dispatch(authSignOutUser());
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
+  };
+
+  const createPost = () => {
+    setloading(true);
+    navigation.push("NewPostScreen");
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
+  };
+
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => dispatch(authSignOutUser())}>
+      <TouchableOpacity onPress={logOut}>
         <Image
           style={styles.logo}
           source={require("../../assets/header-logo.png")}
         />
       </TouchableOpacity>
       <View style={styles.iconContainer}>
-        <TouchableOpacity onPress={() => navigation.push("NewPostScreen")}>
+        <TouchableOpacity disabled={loading} onPress={createPost}>
           <Image
             source={require("../../assets/add-icon.png")}
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity >
           <Image
             source={require("../../assets/heart-icon.png")}
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity >
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadBadgeText}>11</Text>
           </View>

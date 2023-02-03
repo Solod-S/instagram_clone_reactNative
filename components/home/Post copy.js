@@ -65,9 +65,8 @@ const Post = ({ post, navigation }) => {
           post={post}
           comments={comments}
           setLikes={setLikes}
-          likes={likes}
         />
-        <Likes likes={likes} />
+        <Likes liked_users={likes} />
         <Caption user={user} caption={caption} />
         <CommentSection
           comments={comments}
@@ -114,17 +113,10 @@ const PostImage = ({ postImage }) => {
   );
 };
 
-const PostFooter = ({
-  post,
-  currenUser,
-  navigation,
-  comments,
-  setLikes,
-  likes,
-}) => {
+const PostFooter = ({ post, currenUser, navigation, comments, setLikes }) => {
   useEffect(() => {}, []);
   const dispatch = useDispatch();
-  const { postIdTemp, email } = post;
+  const { liked_users, postIdTemp, email } = post;
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <TouchableOpacity style={styles.postFooterLeftContainer}>
@@ -143,7 +135,7 @@ const PostFooter = ({
           <Icon
             imgStyle={styles.postFooterIcon}
             imgUrl={
-              !likes.includes(currenUser)
+              !liked_users.includes(currenUser)
                 ? postFooterIcons[0].image
                 : postFooterIcons[0].imageActive
             }
@@ -185,9 +177,9 @@ const Icon = ({ imgStyle, imgUrl }) => (
   </View>
 );
 
-const Likes = ({ likes }) => (
+const Likes = ({ liked_users }) => (
   <Text style={{ color: "white", marginBottom: 5 }}>
-    {likes.length.toLocaleString("en")} likes
+    {liked_users.length.toLocaleString("en")} likes
   </Text>
 );
 

@@ -17,15 +17,23 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
 
   if (!alreadyLiked) {
     await updateDoc(dbRef, {
-      likes: increment(1),
+      // likes: increment(1),
       liked_users: firebase.firestore.FieldValue.arrayUnion(currenUser),
     });
+
+    const result = [...currentData.liked_users, currenUser];
+    return result;
   } else {
     await updateDoc(dbRef, {
-      likes: increment(-1),
+      // likes: increment(-1),
       liked_users: firebase.firestore.FieldValue.arrayRemove(currenUser),
     });
+    const result = currentData.liked_users.filter(
+      (user) => user !== currenUser
+    );
+    return result;
   }
+
   return alreadyLiked;
 };
 

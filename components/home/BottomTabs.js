@@ -1,20 +1,25 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
 import { useState } from "react";
 import { Divider } from "@rneui/themed";
 
 const BottomTabs = ({ icons }) => {
+  const { profile_picture } = useSelector((state) => state.auth);
+
   const [activeTab, setaAtiveTab] = useState("Home");
-  const Icon = ({ name, icon }) => (
-    <TouchableOpacity onPress={() => setaAtiveTab(name)}>
-      <Image
-        source={icon}
-        style={[
-          styles.icon,
-          name === "Profile" ? styles.profilePic(activeTab) : null,
-        ]}
-      />
-    </TouchableOpacity>
-  );
+  const Icon = ({ name, icon }) => {
+    return (
+      <TouchableOpacity onPress={() => setaAtiveTab(name)}>
+        <Image
+          source={name === "Profile" ? { uri: profile_picture } : icon}
+          style={[
+            styles.icon,
+            name === "Profile" ? styles.profilePic(activeTab) : null,
+          ]}
+        />
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.wrapper}>

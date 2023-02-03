@@ -5,6 +5,7 @@ import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
 import NewPostScreen from "./screens/NewPostScreen";
 import NewCommentScreen from "./screens/NewCommentScreen";
+import ResetPasswordScreen from "./screens/ResetPasswordScreen";
 
 const Stack = createStackNavigator();
 const screenOption = {
@@ -29,6 +30,10 @@ const SignedOutStack = () => {
     >
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="SignupScreen" component={SignupScreen} />
+      <Stack.Screen
+        name="ResetPasswordScreen"
+        component={ResetPasswordScreen}
+      />
     </Stack.Navigator>
   );
 };
