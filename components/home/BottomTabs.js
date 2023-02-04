@@ -1,15 +1,33 @@
-import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Divider } from "@rneui/themed";
 
-const BottomTabs = ({ icons }) => {
+import { bottomTabIcons } from "../../data/bottomTabsIcons";
+
+const BottomTabs = ({ navigation, pageName }) => {
   const { profile_picture } = useSelector((state) => state.auth);
 
-  const [activeTab, setaAtiveTab] = useState("Home");
-  const Icon = ({ name, icon }) => {
+  const [activeTab, setaAtiveTab] = useState("");
+  useEffect(() => {
+    setaAtiveTab(pageName);
+  }, [pageName]);
+
+  const Icon = ({ name, icon, link }) => {
+    const handleNavigation = (name, link) => {
+      if (name === activeTab) {
+        return null;
+      }
+      setaAtiveTab(name);
+      navigation.navigate(link);
+      setaAtiveTab(pageName);
+    };
+
     return (
-      <TouchableOpacity onPress={() => setaAtiveTab(name)}>
+      <TouchableOpacity
+        // onPress={() => setaAtiveTab(name)}
+        onPress={() => handleNavigation(name, link)}
+      >
         <Image
           source={name === "Profile" ? { uri: profile_picture } : icon}
           style={[
@@ -25,11 +43,12 @@ const BottomTabs = ({ icons }) => {
     <View style={styles.wrapper}>
       <Divider width={1} orientation="vertical" />
       <View style={styles.iconContainer}>
-        {icons.length > 0 &&
-          icons.map(({ name, active, inactive }) => (
+        {bottomTabIcons.length > 0 &&
+          bottomTabIcons.map(({ name, active, inactive, link }) => (
             <Icon
               key={name}
               name={name}
+              link={link}
               icon={activeTab === name ? active : inactive}
             />
           ))}

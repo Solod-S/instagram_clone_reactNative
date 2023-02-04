@@ -3,30 +3,36 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../firebase/firebase";
-import { collectionGroup, query, getDocs } from "firebase/firestore";
+import { collectionGroup, query, getDocs, where } from "firebase/firestore";
 
 import { stopUpdatingApp } from "../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../components/SafeViewAndroid";
 import Header from "../components/home/Header";
-import Stories from "../components/home/Stories";
 import Post from "../components/home/Post";
 import BottomTabs from "../components/home/BottomTabs";
+import UserInfo from "../components/profile/UserInfo";
 
-const HomeScreen = ({ navigation }) => {
+const ProfileScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const { status } = useSelector((state) => state.appUpdate);
+  const { email, username, profile_picture } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const q = query(collectionGroup(fsbase, "posts"));
+      const q = query(
+        collectionGroup(fsbase, "posts"),
+        where("email", "==", email)
+      );
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
       }));
-      // console.log(posts);
+
       setPosts(posts);
     };
     try {
@@ -36,6 +42,9 @@ const HomeScreen = ({ navigation }) => {
     } finally {
       dispatch(stopUpdatingApp());
     }
+    return (cleanUp = () => {
+      dispatch(stopUpdatingApp());
+    });
   }, [status === true]);
 
   return (
@@ -46,11 +55,15 @@ const HomeScreen = ({ navigation }) => {
       }}
     >
       <Header navigation={navigation} />
-      <Stories />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ marginBottom: 50 }}
       >
+        <UserInfo
+          username={username}
+          postLength={posts.length}
+          profile_picture={profile_picture}
+        />
         {posts.length > 0 &&
           posts
             .sort((a, b) => a.created < b.created)
@@ -59,12 +72,12 @@ const HomeScreen = ({ navigation }) => {
             ))}
       </ScrollView>
 
-      <BottomTabs navigation={navigation} pageName="Home" />
+      <BottomTabs navigation={navigation} pageName="Profile" />
     </SafeAreaView>
   );
 };
 
-export default HomeScreen;
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: {

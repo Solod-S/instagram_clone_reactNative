@@ -6,6 +6,7 @@ import SignupScreen from "./screens/SignupScreen";
 import NewPostScreen from "./screens/NewPostScreen";
 import NewCommentScreen from "./screens/NewCommentScreen";
 import ResetPasswordScreen from "./screens/ResetPasswordScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const Stack = createStackNavigator();
 const screenOption = {
@@ -14,11 +15,17 @@ const screenOption = {
 
 const SignedInStack = () => {
   return (
-    <Stack.Navigator initialRouteName="HomeScreen" screenOptions={screenOption}>
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      <Stack.Screen name="NewPostScreen" component={NewPostScreen} />
-      <Stack.Screen name="NewCommentScreen" component={NewCommentScreen} />
-    </Stack.Navigator>
+    <>
+      <Stack.Navigator
+        initialRouteName="HomeScreen"
+        screenOptions={screenOption}
+      >
+        <Stack.Screen name="HomeScreen" component={HomeScreen} />
+        <Stack.Screen name="NewPostScreen" component={NewPostScreen} />
+        <Stack.Screen name="NewCommentScreen" component={NewCommentScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      </Stack.Navigator>
+    </>
   );
 };
 
