@@ -33,8 +33,6 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
     );
     return result;
   }
-
-  return alreadyLiked;
 };
 
 export default handleLike;

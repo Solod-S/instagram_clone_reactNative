@@ -1,7 +1,6 @@
 import { SignedInStack, SignedOutStack } from "./navigation";
 import { NavigationContainer } from "@react-navigation/native";
-import BottomTabs from "./components/home/BottomTabs";
-import { bottomTabIcons } from "./data/bottomTabsIcons";
+import BottomTabs from "./components/BottomTabs";
 
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";

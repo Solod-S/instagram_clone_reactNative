@@ -7,6 +7,7 @@ import {
   signOut,
   sendPasswordResetEmail,
   getAuth,
+  getDoc,
 } from "firebase/auth";
 
 import { auth } from "../../firebase/firebase";
@@ -44,6 +45,8 @@ export const authSignUpUser =
         login: login,
         email: email,
         profile_picture: randomPhoto,
+        favorite: [],
+        subscription: "starter",
       });
 
       dispatch(

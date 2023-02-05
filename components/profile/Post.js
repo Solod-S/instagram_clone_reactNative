@@ -15,15 +15,11 @@ import { fsbase } from "../../firebase/firebase";
 import { collection, query, getDocs } from "firebase/firestore";
 import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import { handleLike } from "../../firebase/operations";
+import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation }) => {
-  const [likes, setLikes] = useState(liked_users ? liked_users : []);
-  const currenUser = useSelector((state) => state.auth.owner_uid);
-  const [comments, setComments] = useState([]);
-
+const Post = ({ post, navigation, favorites, setFavorites }) => {
   const {
     profile_picture,
     email,
@@ -33,6 +29,12 @@ const Post = ({ post, navigation }) => {
     postIdTemp,
     liked_users,
   } = post;
+
+  const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
+  // const [favorites, setFavorites] = useState(favoriteData);
+  const currenUser = useSelector((state) => state.auth.owner_uid);
+  const currentUserId = useSelector((state) => state.auth.email);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const fetchComments = async (email, postIdTemp) => {
@@ -65,8 +67,12 @@ const Post = ({ post, navigation }) => {
           post={post}
           comments={comments}
           setLikes={setLikes}
+          likes={likes}
+          setFavorites={setFavorites}
+          favorites={favorites}
+          currentUserId={currentUserId}
         />
-        <Likes liked_users={likes} />
+        <Likes likes={likes} />
         <Caption user={user} caption={caption} />
         <CommentSection
           comments={comments}
@@ -113,13 +119,22 @@ const PostImage = ({ postImage }) => {
   );
 };
 
-const PostFooter = ({ post, currenUser, navigation, comments, setLikes }) => {
-  useEffect(() => {}, []);
+const PostFooter = ({
+  post,
+  currenUser,
+  navigation,
+  comments,
+  setLikes,
+  likes,
+  setFavorites,
+  favorites,
+  currentUserId,
+}) => {
+  const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
-  const { liked_users, postIdTemp, email } = post;
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
-      <TouchableOpacity style={styles.postFooterLeftContainer}>
+      <View style={styles.postFooterLeftContainer}>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
           onPress={async () => {
@@ -135,7 +150,7 @@ const PostFooter = ({ post, currenUser, navigation, comments, setLikes }) => {
           <Icon
             imgStyle={styles.postFooterIcon}
             imgUrl={
-              !liked_users.includes(currenUser)
+              !likes.includes(currenUser)
                 ? postFooterIcons[0].image
                 : postFooterIcons[0].imageActive
             }
@@ -158,12 +173,25 @@ const PostFooter = ({ post, currenUser, navigation, comments, setLikes }) => {
             imgUrl={postFooterIcons[2].image}
           />
         </TouchableOpacity>
-      </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.postFooterRightContainer}>
-        <TouchableOpacity style={{ height: 25, width: 25 }}>
+        <TouchableOpacity
+          style={{ height: 25, width: 25 }}
+          onPress={async () => {
+            const updatedFavorites = await handleFavorite(
+              postId,
+              currentUserId
+            );
+            setFavorites(updatedFavorites);
+          }}
+        >
           <Icon
             imgStyle={styles.postFooterIcon}
-            imgUrl={postFooterIcons[3].image}
+            imgUrl={
+              !favorites.includes(postId)
+                ? postFooterIcons[3].image
+                : postFooterIcons[3].imageActive
+            }
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -177,9 +205,9 @@ const Icon = ({ imgStyle, imgUrl }) => (
   </View>
 );
 
-const Likes = ({ liked_users }) => (
+const Likes = ({ likes }) => (
   <Text style={{ color: "white", marginBottom: 5 }}>
-    {liked_users.length.toLocaleString("en")} likes
+    {likes.length.toLocaleString("en")} likes
   </Text>
 );
 

@@ -1,25 +1,53 @@
 import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../firebase/firebase";
-import { collectionGroup, query, getDocs, where } from "firebase/firestore";
+import {
+  collectionGroup,
+  query,
+  getDocs,
+  doc,
+  getDoc,
+  where,
+} from "firebase/firestore";
 
-import { stopUpdatingApp } from "../redux/auth/appUpdateSlice";
+import {
+  stopUpdatingApp,
+  startUpdatingApp,
+} from "../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../components/SafeViewAndroid";
+import BottomTabs from "../components/BottomTabs";
 import Header from "../components/home/Header";
-import Post from "../components/home/Post";
-import BottomTabs from "../components/home/BottomTabs";
+import Post from "../components/profile/Post";
+
 import UserInfo from "../components/profile/UserInfo";
 
 const ProfileScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+
   const { status } = useSelector((state) => state.appUpdate);
   const { email, username, profile_picture } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
+
+  useLayoutEffect(() => {
+    const fetchFavorite = async (email) => {
+      const dbRef = doc(fsbase, `users/${email}`);
+      const postsDetails = await getDoc(dbRef);
+      const currentData = postsDetails.data();
+      const favoriteData = currentData.favorite;
+      setFavorites(favoriteData);
+    };
+    try {
+      fetchFavorite(email);
+    } catch (error) {
+      console.log(`fetchFavorite.error`);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -42,9 +70,6 @@ const ProfileScreen = ({ navigation }) => {
     } finally {
       dispatch(stopUpdatingApp());
     }
-    return (cleanUp = () => {
-      dispatch(stopUpdatingApp());
-    });
   }, [status === true]);
 
   return (
@@ -63,12 +88,19 @@ const ProfileScreen = ({ navigation }) => {
           username={username}
           postLength={posts.length}
           profile_picture={profile_picture}
+          favorites={favorites}
         />
         {posts.length > 0 &&
           posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
-              <Post key={post.postId} post={post} navigation={navigation} />
+              <Post
+                key={post.postId}
+                post={post}
+                navigation={navigation}
+                favorites={favorites}
+                setFavorites={setFavorites}
+              />
             ))}
       </ScrollView>
 

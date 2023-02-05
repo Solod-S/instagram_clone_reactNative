@@ -9,7 +9,8 @@ import {
 
 import { Divider } from "@rneui/themed";
 
-const UserInfo = ({ username, postLength, profile_picture }) => {
+const UserInfo = ({ username, postLength, profile_picture, favorites }) => {
+  console.log(username);
   return (
     <View
       style={{
@@ -19,12 +20,12 @@ const UserInfo = ({ username, postLength, profile_picture }) => {
         paddingHorizontal: 5,
       }}
     >
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, alignItems: "center", fontWeight: "700" }}>
         <Image
           source={{ uri: profile_picture }}
           style={{ width: 100, height: 100, borderRadius: 50 }}
         />
-        <Text style={{ color: "where" }}>{username}</Text>
+        <Text style={{ color: "white" }}>{username}</Text>
       </View>
 
       <View
@@ -39,7 +40,7 @@ const UserInfo = ({ username, postLength, profile_picture }) => {
           <Text style={styles.description}>pos...</Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.number}>0</Text>
+          <Text style={styles.number}>{favorites.length}</Text>
           <Text style={styles.description}>fav...</Text>
         </View>
         <View style={styles.infoContainer}>

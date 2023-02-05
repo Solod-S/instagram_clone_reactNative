@@ -15,15 +15,11 @@ import { fsbase } from "../../firebase/firebase";
 import { collection, query, getDocs } from "firebase/firestore";
 import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import { handleLike } from "../../firebase/operations";
+import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation }) => {
-  const [likes, setLikes] = useState(liked_users ? liked_users : []);
-  const currenUser = useSelector((state) => state.auth.owner_uid);
-  const [comments, setComments] = useState([]);
-
+const Post = ({ post, navigation, favoriteData }) => {
   const {
     profile_picture,
     email,
@@ -33,6 +29,12 @@ const Post = ({ post, navigation }) => {
     postIdTemp,
     liked_users,
   } = post;
+
+  const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
+  const [favorites, setFavorites] = useState(favoriteData);
+  const currenUser = useSelector((state) => state.auth.owner_uid);
+  const currentUserId = useSelector((state) => state.auth.email);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const fetchComments = async (email, postIdTemp) => {
@@ -66,6 +68,9 @@ const Post = ({ post, navigation }) => {
           comments={comments}
           setLikes={setLikes}
           likes={likes}
+          setFavorites={setFavorites}
+          favorites={favorites}
+          currentUserId={currentUserId}
         />
         <Likes likes={likes} />
         <Caption user={user} caption={caption} />
@@ -121,13 +126,15 @@ const PostFooter = ({
   comments,
   setLikes,
   likes,
+  setFavorites,
+  favorites,
+  currentUserId,
 }) => {
-  useEffect(() => {}, []);
+  const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
-  const { postIdTemp, email } = post;
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
-      <TouchableOpacity style={styles.postFooterLeftContainer}>
+      <View style={styles.postFooterLeftContainer}>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
           onPress={async () => {
@@ -166,12 +173,25 @@ const PostFooter = ({
             imgUrl={postFooterIcons[2].image}
           />
         </TouchableOpacity>
-      </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.postFooterRightContainer}>
-        <TouchableOpacity style={{ height: 25, width: 25 }}>
+        <TouchableOpacity
+          style={{ height: 25, width: 25 }}
+          onPress={async () => {
+            const updatedFavorites = await handleFavorite(
+              postId,
+              currentUserId
+            );
+            setFavorites(updatedFavorites);
+          }}
+        >
           <Icon
             imgStyle={styles.postFooterIcon}
-            imgUrl={postFooterIcons[3].image}
+            imgUrl={
+              !favorites.includes(postId)
+                ? postFooterIcons[3].image
+                : postFooterIcons[3].imageActive
+            }
           />
         </TouchableOpacity>
       </TouchableOpacity>

@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import { Divider } from "@rneui/themed";
 
-import { bottomTabIcons } from "../../data/bottomTabsIcons";
+import { bottomTabIcons } from "../data/bottomTabsIcons";
 
 const BottomTabs = ({ navigation, pageName }) => {
   const { profile_picture } = useSelector((state) => state.auth);
@@ -19,7 +19,8 @@ const BottomTabs = ({ navigation, pageName }) => {
         return null;
       }
       setaAtiveTab(name);
-      navigation.navigate(link);
+      navigation.replace(link);
+      // navigation.navigate(link);
       setaAtiveTab(pageName);
     };
 
