@@ -139,7 +139,6 @@ const Comment = ({
   date,
   time,
 }) => {
-  // console.log(date.toLocaleDateString());
   return (
     <View
       style={{

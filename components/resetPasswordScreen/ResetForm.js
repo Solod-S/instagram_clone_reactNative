@@ -20,7 +20,6 @@ const ResetForm = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const onReset = async (email, password) => {
-    console.log(email);
     dispatch(authResetPassword(email));
   };
 

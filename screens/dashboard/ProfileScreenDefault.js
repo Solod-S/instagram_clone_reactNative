@@ -1,8 +1,9 @@
 import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { memo } from "react";
 
-import { fsbase } from "../firebase/firebase";
+import { fsbase } from "../../firebase/firebase";
 import {
   collectionGroup,
   query,
@@ -15,16 +16,16 @@ import {
 import {
   stopUpdatingApp,
   startUpdatingApp,
-} from "../redux/auth/appUpdateSlice";
+} from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../components/SafeViewAndroid";
-import BottomTabs from "../components/BottomTabs";
-import Header from "../components/home/Header";
-import Post from "../components/profile/Post";
+import SafeViewAndroid from "../../components/SafeViewAndroid";
+// import BottomTabs from "../components/BottomTabs";
+import Header from "../../components/profile/Header";
+import MyPost from "../../components/profile/MyPost";
 
-import UserInfo from "../components/profile/UserInfo";
+import UserInfo from "../../components/profile/UserInfo";
 
-const ProfileScreen = ({ navigation }) => {
+const ProfileScreenDefault = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
@@ -82,7 +83,7 @@ const ProfileScreen = ({ navigation }) => {
       <Header navigation={navigation} />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        style={{ marginBottom: 50 }}
+        // style={{ marginBottom: 50 }}
       >
         <UserInfo
           username={username}
@@ -94,7 +95,7 @@ const ProfileScreen = ({ navigation }) => {
           posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
-              <Post
+              <MyPost
                 key={post.postId}
                 post={post}
                 navigation={navigation}
@@ -104,12 +105,12 @@ const ProfileScreen = ({ navigation }) => {
             ))}
       </ScrollView>
 
-      <BottomTabs navigation={navigation} pageName="Profile" />
+      {/* <BottomTabs navigation={navigation} pageName="Profile" /> */}
     </SafeAreaView>
   );
 };
 
-export default ProfileScreen;
+export default ProfileScreenDefault;
 
 const styles = StyleSheet.create({
   container: {

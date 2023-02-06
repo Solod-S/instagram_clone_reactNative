@@ -55,7 +55,7 @@ const handlePostsAndComments = async () => {
       return { ...el, comments: commetnsInfo };
     })
   );
-  console.log(`commentsAndPosts`, commentsAndPosts);
+
   return commentsAndPosts;
   // setPosts(commentsAndPosts);
 };

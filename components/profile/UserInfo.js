@@ -10,7 +10,6 @@ import {
 import { Divider } from "@rneui/themed";
 
 const UserInfo = ({ username, postLength, profile_picture, favorites }) => {
-  console.log(username);
   return (
     <View
       style={{

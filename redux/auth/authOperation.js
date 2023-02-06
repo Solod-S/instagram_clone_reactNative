@@ -88,7 +88,6 @@ export const authSignInUser =
 
 export const authResetPassword =
   (email, navigation) => async (dispatch, getState) => {
-    console.log(`email`, email);
     sendPasswordResetEmail(auth, email)
       .then(() => {
         Alert.alert("Password reset email sent!");

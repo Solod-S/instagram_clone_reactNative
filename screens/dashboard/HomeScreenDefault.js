@@ -5,11 +5,13 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
-import { useEffect, useState, useLayoutEffect, useCallback } from "react";
+import { useMemo } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 
-import { fsbase } from "../firebase/firebase";
+import { fsbase } from "../../firebase/firebase";
 import {
   collectionGroup,
   query,
@@ -18,22 +20,23 @@ import {
   getDoc,
 } from "firebase/firestore";
 
-import { stopUpdatingApp } from "../redux/auth/appUpdateSlice";
+import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../components/SafeViewAndroid";
-import Header from "../components/home/Header";
-import Stories from "../components/home/Stories";
-import Post from "../components/home/Post";
-import BottomTabs from "../components/BottomTabs";
+import SafeViewAndroid from "../../components/SafeViewAndroid";
+import Header from "../../components/home/Header";
+import Stories from "../../components/home/Stories";
+import Post from "../../components/home/Post";
 
-const HomeScreen = ({ navigation }) => {
+const NestedScreen = createStackNavigator();
+
+const HomeScreenDefault = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const { email } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
   const dispatch = useDispatch();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const fetchFavorite = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
@@ -49,27 +52,25 @@ const HomeScreen = ({ navigation }) => {
     }
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      const fetchPosts = async () => {
-        const q = query(collectionGroup(fsbase, "posts"));
-        const snapshot = await getDocs(q);
-        const posts = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          postIdTemp: doc.id,
-        }));
-        setPosts(posts.sort((a, b) => a.created < b.created));
-      };
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const q = query(collectionGroup(fsbase, "posts"));
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        postIdTemp: doc.id,
+      }));
+      setPosts(posts.sort((a, b) => a.created < b.created));
+    };
 
-      try {
-        fetchPosts();
-      } catch (error) {
-        console.log(error);
-      } finally {
-        dispatch(stopUpdatingApp());
-      }
-    }, [status === true])
-  );
+    try {
+      fetchPosts();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch(stopUpdatingApp());
+    }
+  }, [status === true]);
 
   const keyExtractor = (item) => item?.postId;
 
@@ -85,7 +86,7 @@ const HomeScreen = ({ navigation }) => {
       {posts.length > 0 && (
         <FlatList
           data={posts}
-          // initialNumToRender={4}
+          initialNumToRender={4}
           showsVerticalScrollIndicator={false}
           keyExtractor={keyExtractor}
           renderItem={({ item }) => {
@@ -99,12 +100,11 @@ const HomeScreen = ({ navigation }) => {
           }}
         />
       )}
-      <BottomTabs navigation={navigation} pageName="Home" />
     </SafeAreaView>
   );
 };
 
-export default HomeScreen;
+export default HomeScreenDefault;
 
 const styles = StyleSheet.create({
   container: {

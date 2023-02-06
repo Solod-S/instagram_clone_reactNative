@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { memo } from "react";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "@rneui/themed";
@@ -19,7 +20,7 @@ import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, favorites, setFavorites }) => {
+const MyPost = ({ post, navigation, favorites, setFavorites }) => {
   const {
     profile_picture,
     email,
@@ -314,4 +315,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Post;
+export default memo(MyPost);

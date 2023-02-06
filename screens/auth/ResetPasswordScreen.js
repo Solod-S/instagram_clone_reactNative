@@ -1,10 +1,10 @@
 import { StyleSheet, View, Image } from "react-native";
 import { SafeAreaView } from "react-native";
 
-import SafeViewAndroid from "../components/SafeViewAndroid";
-import SignupForm from "../components/signUpScreen/SignUp";
+import ResetForm from "../../components/resetPasswordScreen/ResetForm";
+import SafeViewAndroid from "../../components/SafeViewAndroid";
 
-const SignupScreen = ({ navigation }) => (
+const ResetPasswordScreen = ({ navigation }) => (
   <SafeAreaView
     style={{
       ...SafeViewAndroid.AndroidSafeArea,
@@ -13,9 +13,9 @@ const SignupScreen = ({ navigation }) => (
   >
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={require("../assets/logo.png")} />
+        <Image style={styles.logo} source={require("../../assets/logo.png")} />
       </View>
-      <SignupForm navigation={navigation} />
+      <ResetForm navigation={navigation} />
     </View>
   </SafeAreaView>
 );
@@ -37,4 +37,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignupScreen;
+export default ResetPasswordScreen;

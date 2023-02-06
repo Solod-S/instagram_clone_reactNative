@@ -97,7 +97,6 @@ const FormikCommentUploader = ({ userIdTemp, postIdTemp, setComments }) => {
         } catch (error) {
           console.log(`handComments.error`, error);
         }
-        // console.log(values);
       }}
       validationSchema={uploadCommentSchema}
       validateOnMount={true}

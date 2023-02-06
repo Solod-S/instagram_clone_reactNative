@@ -1,12 +1,13 @@
 import { SafeAreaView } from "react-native";
+import { LogBox } from "react-native";
 import { useEffect, useState, useRef } from "react";
 
-import { fsbase } from "../firebase/firebase";
+import { fsbase } from "../../../firebase/firebase";
 import "firebase/compat/firestore";
 import { collection, query, getDocs } from "firebase/firestore";
 
-import SafeViewAndroid from "../components/SafeViewAndroid";
-import AddNewComment from "../components/newComment/AddNewComment";
+import SafeViewAndroid from "../../../components/SafeViewAndroid";
+import AddNewComment from "../../../components/newComment/AddNewComment";
 
 const NewCommentScreen = ({ navigation, route }) => {
   const prevCommentsRef = useRef();
@@ -55,3 +56,7 @@ const NewCommentScreen = ({ navigation, route }) => {
 };
 
 export default NewCommentScreen;
+
+LogBox.ignoreLogs([
+  "Non-serializable values were found in the navigation state",
+]);

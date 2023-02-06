@@ -157,8 +157,6 @@ const FormikPostUploader = ({ navigation }) => {
           await uploadPostToServer(values.caption);
           setPostImage("");
           navigation.goBack();
-
-          // console.log(values, postImage), navigation.goBack();
         }}
         validationSchema={uploadPostSchema}
         validateOnMount={true}
