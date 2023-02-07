@@ -28,6 +28,7 @@
     "expo-status-bar": "~1.4.2",
     "firebase": "^9.16.0",
     "formik": "^2.2.9",
+    "lottie-react-native": "^5.1.5",
     "native": "^0.3.3",
     "react": "^18.1.0",
     "react-native": "0.70.5",

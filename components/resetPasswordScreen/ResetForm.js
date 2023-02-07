@@ -59,7 +59,7 @@ const ResetForm = ({ navigation }) => {
                 autoCapitalize="none"
                 keyboardType="email-adress"
                 textContentType="emailAddress"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("email")}
                 onBlur={handleBlur("email")}
                 value={values.email}

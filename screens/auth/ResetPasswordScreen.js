@@ -1,24 +1,69 @@
-import { StyleSheet, View, Image } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SafeAreaView } from "react-native";
+import { useState, useEffect } from "react";
 
 import ResetForm from "../../components/resetPasswordScreen/ResetForm";
 import SafeViewAndroid from "../../components/SafeViewAndroid";
 
-const ResetPasswordScreen = ({ navigation }) => (
-  <SafeAreaView
-    style={{
-      ...SafeViewAndroid.AndroidSafeArea,
-      backgroundColor: "white",
-    }}
-  >
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={require("../../assets/logo.png")} />
-      </View>
-      <ResetForm navigation={navigation} />
-    </View>
-  </SafeAreaView>
-);
+const ResetPasswordScreen = ({ navigation }) => {
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const keyboardHide = () => {
+    setKeyboardVisible(false);
+    Keyboard.dismiss();
+  };
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
+
+  return (
+    <SafeAreaView
+      style={{
+        ...SafeViewAndroid.AndroidSafeArea,
+        backgroundColor: "white",
+      }}
+    >
+      <TouchableWithoutFeedback onPress={keyboardHide}>
+        <View style={styles.container}>
+          <View
+            style={{
+              ...styles.logoContainer,
+              marginTop: isKeyboardVisible ? 0 : 50,
+            }}
+          >
+            <Image
+              style={styles.logo}
+              source={require("../../assets/logo.png")}
+            />
+          </View>
+          <ResetForm navigation={navigation} />
+        </View>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -29,7 +74,6 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 50,
   },
   logo: {
     height: 100,

@@ -69,7 +69,7 @@ const LoginForm = ({ navigation }) => {
                 autoCapitalize="none"
                 keyboardType="email-adress"
                 textContentType="emailAddress"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("email")}
                 onBlur={handleBlur("email")}
                 value={values.email}
@@ -99,7 +99,7 @@ const LoginForm = ({ navigation }) => {
                 autoCorrect={false}
                 secureTextEntry={true}
                 textContentType="password"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}

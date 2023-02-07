@@ -80,7 +80,7 @@ const SignupForm = ({ navigation }) => {
                 autoCapitalize="none"
                 keyboardType="email-adress"
                 textContentType="emailAddress"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("email")}
                 onBlur={handleBlur("email")}
                 value={values.email}
@@ -109,7 +109,7 @@ const SignupForm = ({ navigation }) => {
                 autoCapitalize="none"
                 keyboardType="email-adress"
                 textContentType="emailAddress"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("username")}
                 onBlur={handleBlur("username")}
                 value={values.username}
@@ -139,7 +139,7 @@ const SignupForm = ({ navigation }) => {
                 autoCorrect={false}
                 secureTextEntry={true}
                 textContentType="password"
-                autoFocus={true}
+                autoFocus={false}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}
