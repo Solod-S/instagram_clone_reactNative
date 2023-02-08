@@ -7,6 +7,7 @@ import {
   Alert,
 } from "react-native";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { validate } from "email-validator";
@@ -26,7 +27,12 @@ const SignupFormSchema = yup.object().shape({
 });
 
 const SignupForm = ({ navigation }) => {
+  const [showPass, setShowPass] = useState(false);
   const dispatch = useDispatch();
+
+  const toglePass = () => {
+    setShowPass(!showPass);
+  };
 
   const onSignup = async (login, email, password) => {
     try {
@@ -137,14 +143,28 @@ const SignupForm = ({ navigation }) => {
                 placeholder="Password"
                 autoCapitalize="none"
                 autoCorrect={false}
-                secureTextEntry={true}
+                secureTextEntry={!showPass ? true : false}
                 textContentType="password"
                 autoFocus={false}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
                 value={values.password}
-                style={styles.text}
+                style={{ ...styles.text, paddingRight: 50 }}
               />
+              <TouchableOpacity
+                style={{
+                  position: "absolute",
+                  top: 14,
+                  right: 16,
+                  zIndex: 99,
+                }}
+                activeOpacity={0.6}
+                onPress={toglePass}
+              >
+                <Text style={styles.showPass}>
+                  {!showPass ? "Show" : "Hide"}
+                </Text>
+              </TouchableOpacity>
             </View>
             {/* {errors.password && (
               <Text style={{ color: "red", fontSize: 10 }}>
@@ -180,6 +200,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#FAFAFA",
     marginBottom: 10,
     borderWidth: 1,
+  },
+  showPass: {
+    position: "absolute",
+    // fontSize: 16,
+    // lineHeight: 19,
+    color: "#1B4371",
+    right: 5,
+    opacity: 0.6,
   },
   text: {
     fontSize: 16,

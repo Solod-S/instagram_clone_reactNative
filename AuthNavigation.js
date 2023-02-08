@@ -13,8 +13,8 @@ const AuthNavigation = () => {
   const dispatch = useDispatch();
   const didMountRef = useRef(false);
   useEffect(() => {
-    setInterval(() => {
-      setLoading(!loading);
+    setTimeout(() => {
+      setLoading(false);
     }, 3000);
     dispatch(authStateChangeUsers());
   }, [stateChange]);

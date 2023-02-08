@@ -4,6 +4,7 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import HomeScreenDefault from "./HomeScreenDefault";
 import NewCommentScreen from "./nestedScreens/NewCommentScreen";
 import NewPostScreen from "./nestedScreens/NewPostScreen";
+import Sceleton from "./Sceleton";
 
 const NestedScreen = createStackNavigator();
 
@@ -31,6 +32,11 @@ const HomeScreen = ({ navigation, route }) => {
         name="NewCommentScreen"
         component={NewCommentScreen}
       />
+      {/* <NestedScreen.Screen
+        options={{ headerShown: false }}
+        name="NewPostScreen"
+        component={NewPostScreen}
+      /> */}
       <NestedScreen.Screen
         options={{ headerShown: false }}
         name="NewPostScreen"

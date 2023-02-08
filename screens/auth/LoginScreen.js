@@ -14,10 +14,12 @@ import LoginForm from "../../components/loginScreen/LoginForm";
 
 const LoginScreen = ({ navigation }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
   const keyboardHide = () => {
     setKeyboardVisible(false);
     Keyboard.dismiss();
   };
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
