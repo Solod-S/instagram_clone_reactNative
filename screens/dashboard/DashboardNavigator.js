@@ -3,6 +3,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
+import Sceleton from "./Sceleton";
 
 //screens
 
@@ -83,7 +84,7 @@ const DashboardNavigator = ({ navigation }) => {
             />
           ),
         }}
-        component={ProfileScreen}
+        component={Sceleton}
       />
       <MainTab.Screen
         name="ProfileScreen"

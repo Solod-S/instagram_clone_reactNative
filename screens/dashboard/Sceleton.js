@@ -1,5 +1,10 @@
-import { Instagram } from "react-content-loader";
+import {
+  FacebookLoader,
+  InstagramLoader,
+} from "react-native-easy-content-loader";
 
-const Sceleton = () => <Instagram />;
+const Sceleton = () => {
+  return <InstagramLoader active />;
+};
 
 export default Sceleton;

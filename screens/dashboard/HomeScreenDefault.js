@@ -9,7 +9,10 @@ import { useMemo } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useFocusEffect } from "@react-navigation/native";
+import {
+  FacebookLoader,
+  InstagramLoader,
+} from "react-native-easy-content-loader";
 
 import { fsbase } from "../../firebase/firebase";
 import {
@@ -19,7 +22,6 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/SafeViewAndroid";
@@ -30,6 +32,7 @@ import Post from "../../components/home/Post";
 const NestedScreen = createStackNavigator();
 
 const HomeScreenDefault = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const { email } = useSelector((state) => state.auth);
@@ -60,10 +63,12 @@ const HomeScreenDefault = ({ navigation }) => {
         ...doc.data(),
         postIdTemp: doc.id,
       }));
+      setIsLoading(false);
       setPosts(posts.sort((a, b) => a.created < b.created));
     };
 
     try {
+      setIsLoading(true);
       fetchPosts();
     } catch (error) {
       console.log(error);
@@ -83,6 +88,20 @@ const HomeScreenDefault = ({ navigation }) => {
     >
       <Header navigation={navigation} />
       <Stories />
+
+      {isLoading && (
+        <ScrollView>
+          <InstagramLoader
+            active
+            listSize={4}
+            imageHeight={300}
+            primaryColor="#434446"
+            secondaryColor="#303030"
+            aSize={40}
+            sTHeight={0}
+          />
+        </ScrollView>
+      )}
       {posts.length > 0 && (
         <FlatList
           data={posts}

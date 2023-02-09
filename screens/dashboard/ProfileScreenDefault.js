@@ -1,7 +1,10 @@
 import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { memo } from "react";
+import {
+  FacebookLoader,
+  InstagramLoader,
+} from "react-native-easy-content-loader";
 
 import { fsbase } from "../../firebase/firebase";
 import {
@@ -26,6 +29,7 @@ import MyPost from "../../components/profile/MyPost";
 import UserInfo from "../../components/profile/UserInfo";
 
 const ProfileScreenDefault = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
@@ -61,10 +65,11 @@ const ProfileScreenDefault = ({ navigation }) => {
         ...doc.data(),
         postIdTemp: doc.id,
       }));
-
+      setIsLoading(false);
       setPosts(posts);
     };
     try {
+      setIsLoading(true);
       fetchPosts();
     } catch (error) {
       console.log(error);
@@ -91,6 +96,19 @@ const ProfileScreenDefault = ({ navigation }) => {
           profile_picture={profile_picture}
           favorites={favorites}
         />
+        {isLoading && (
+          <ScrollView>
+            <InstagramLoader
+              active
+              listSize={4}
+              imageHeight={300}
+              primaryColor="#434446"
+              secondaryColor="#303030"
+              aSize={40}
+              sTHeight={0}
+            />
+          </ScrollView>
+        )}
         {posts.length > 0 &&
           posts
             .sort((a, b) => a.created < b.created)
