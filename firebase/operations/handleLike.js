@@ -10,6 +10,7 @@ import {
 } from "firebase/firestore";
 
 const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
+  console.log(userIdTemp, postIdTemp, userIdTemp);
   const dbRef = doc(fsbase, `users/${userIdTemp}/posts/${postIdTemp}`);
   const postsDetails = await getDoc(dbRef);
   const currentData = postsDetails.data();

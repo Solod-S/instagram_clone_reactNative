@@ -3,7 +3,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import Sceleton from "./Sceleton";
+import FavoritesScreen from "./FavoritesScreen";
 
 //screens
 
@@ -72,7 +72,7 @@ const DashboardNavigator = ({ navigation }) => {
       <MainTab.Screen
         name="FavoriteScreen"
         options={{
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           tabBarIcon: ({ focused, size, color }) => (
@@ -84,7 +84,7 @@ const DashboardNavigator = ({ navigation }) => {
             />
           ),
         }}
-        component={Sceleton}
+        component={FavoritesScreen}
       />
       <MainTab.Screen
         name="ProfileScreen"
