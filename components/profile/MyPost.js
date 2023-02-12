@@ -52,7 +52,7 @@ const MyPost = ({ post, navigation, favorites, setFavorites }) => {
     try {
       fetchComments(email, postIdTemp);
     } catch (error) {
-      console.log(`fetchComments.error`, error);
+      console.log(`fetchComments.error`, error.message);
     }
   }, [post]);
 

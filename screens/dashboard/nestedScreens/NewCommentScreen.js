@@ -34,7 +34,7 @@ const NewCommentScreen = ({ navigation, route }) => {
     try {
       fetchComments(post.email, post.postIdTemp);
     } catch (error) {
-      console.log(`fetchComments.error`, error);
+      console.log(`fetchComments.error`, error.message);
     }
   }, [comments]);
 

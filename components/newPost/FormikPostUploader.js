@@ -89,7 +89,7 @@ const FormikPostUploader = ({ navigation }) => {
         return url;
       })
       .catch((error) => {
-        console.log(`error.processedPhoto`, error);
+        console.log(`error.processedPhoto`, error.message);
       });
     return processedPhoto;
   };

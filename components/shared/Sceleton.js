@@ -1,14 +1,12 @@
-import {
-  FacebookLoader,
-  InstagramLoader,
-} from "react-native-easy-content-loader";
+import { InstagramLoader } from "react-native-easy-content-loader";
+import { ScrollView } from "react-native";
 
 const PostsSceleton = () => {
   return (
     <ScrollView>
       <InstagramLoader
         active
-        listSize={4}
+        listSize={2}
         imageHeight={300}
         primaryColor="#434446"
         secondaryColor="#303030"

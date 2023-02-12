@@ -4,7 +4,6 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import FavoritesScreenDefault from "./FavoritesScreenDefault";
 import NewCommentScreen from "./nestedScreens/NewCommentScreen";
 import NewPostScreen from "./nestedScreens/NewPostScreen";
-import MyLoader from "./Sceleton";
 
 const NestedScreen = createStackNavigator();
 

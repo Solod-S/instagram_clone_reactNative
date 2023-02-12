@@ -1,10 +1,13 @@
-import { Text, SafeAreaView, StyleSheet, ScrollView } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  Image,
+} from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  FacebookLoader,
-  InstagramLoader,
-} from "react-native-easy-content-loader";
 
 import { fsbase } from "../../firebase/firebase";
 import {
@@ -15,16 +18,12 @@ import {
   getDoc,
   where,
 } from "firebase/firestore";
-
-import {
-  stopUpdatingApp,
-  startUpdatingApp,
-} from "../../redux/auth/appUpdateSlice";
+import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/SafeViewAndroid";
-// import BottomTabs from "../components/BottomTabs";
 import Header from "../../components/profile/Header";
-import MyPost from "../../components/profile/MyPost";
+import Post from "../../components/shared/Post";
+import PostsSceleton from "../../components/shared/Sceleton";
 
 import UserInfo from "../../components/profile/UserInfo";
 
@@ -50,7 +49,7 @@ const ProfileScreenDefault = ({ navigation }) => {
     try {
       fetchFavorite(email);
     } catch (error) {
-      console.log(`fetchFavorite.error`);
+      console.log(`fetchFavorite.error`, error.message);
     }
   }, []);
 
@@ -72,11 +71,39 @@ const ProfileScreenDefault = ({ navigation }) => {
       setIsLoading(true);
       fetchPosts();
     } catch (error) {
-      console.log(error);
+      console.log(`fetchPosts.error`, error.message);
     } finally {
       dispatch(stopUpdatingApp());
     }
   }, [status === true]);
+
+  if (!posts.length) {
+    return (
+      <SafeAreaView
+        style={{
+          ...SafeViewAndroid.AndroidSafeArea,
+          backgroundColor: "black",
+        }}
+      >
+        <Header navigation={navigation} />
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={require("../../assets/icons/favorites-empty.png")}
+            style={{ width: 200, height: 200, marginBottom: 10 }}
+          />
+          <Text style={{ color: "white" }}>
+            You don't have any favorite posts..
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -96,24 +123,12 @@ const ProfileScreenDefault = ({ navigation }) => {
           profile_picture={profile_picture}
           favorites={favorites}
         />
-        {isLoading && (
-          <ScrollView>
-            <InstagramLoader
-              active
-              listSize={4}
-              imageHeight={300}
-              primaryColor="#434446"
-              secondaryColor="#303030"
-              aSize={40}
-              sTHeight={0}
-            />
-          </ScrollView>
-        )}
+        {isLoading && <PostsSceleton />}
         {posts.length > 0 &&
           posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
-              <MyPost
+              <Post
                 key={post.postId}
                 post={post}
                 navigation={navigation}

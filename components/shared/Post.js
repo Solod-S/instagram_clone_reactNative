@@ -20,7 +20,7 @@ import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, favoriteData }) => {
+const Post = ({ post, navigation, favorites, setFavorites }) => {
   const {
     profile_picture,
     email,
@@ -32,7 +32,7 @@ const Post = ({ post, navigation, favoriteData }) => {
   } = post;
 
   const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
-  const [favorites, setFavorites] = useState(favoriteData);
+  // const [favorites, setFavorites] = useState(favoriteData);
   const currenUser = useSelector((state) => state.auth.owner_uid);
   const currentUserId = useSelector((state) => state.auth.email);
   const [comments, setComments] = useState([]);
@@ -52,7 +52,7 @@ const Post = ({ post, navigation, favoriteData }) => {
     try {
       fetchComments(email, postIdTemp);
     } catch (error) {
-      console.log(`fetchComments.error`, error);
+      console.log(`fetchComments.error`, error.message);
     }
   }, [post]);
 

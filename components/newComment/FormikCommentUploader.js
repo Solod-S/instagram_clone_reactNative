@@ -95,7 +95,7 @@ const FormikCommentUploader = ({ userIdTemp, postIdTemp, setComments }) => {
           actions.setSubmitting(false);
           actions.resetForm();
         } catch (error) {
-          console.log(`handComments.error`, error);
+          console.log(`handComments.error`, error.message);
         }
       }}
       validationSchema={uploadCommentSchema}

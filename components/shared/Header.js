@@ -25,7 +25,6 @@ const Header = ({ navigation }) => {
     }, 2000);
   };
 
-
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={logOut}>
@@ -41,13 +40,13 @@ const Header = ({ navigation }) => {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity >
+        <TouchableOpacity>
           <Image
             source={require("../../assets/heart-icon.png")}
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity >
+        <TouchableOpacity>
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadBadgeText}>11</Text>
           </View>

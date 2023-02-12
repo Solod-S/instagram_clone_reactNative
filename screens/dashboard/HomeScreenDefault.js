@@ -1,18 +1,7 @@
-import {
-  Text,
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-} from "react-native";
-import { useMemo } from "react";
+import { SafeAreaView, FlatList } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  FacebookLoader,
-  InstagramLoader,
-} from "react-native-easy-content-loader";
 
 import { fsbase } from "../../firebase/firebase";
 import {
@@ -27,9 +16,8 @@ import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 import SafeViewAndroid from "../../components/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Stories from "../../components/home/Stories";
-import Post from "../../components/home/Post";
-
-const NestedScreen = createStackNavigator();
+import Post from "../../components/shared/Post";
+import PostsSceleton from "../../components/shared/Sceleton";
 
 const HomeScreenDefault = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,14 +32,14 @@ const HomeScreenDefault = ({ navigation }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData.favorite;
+      const favoriteData = currentData ? await currentData.favorite : [];
       setFavorites(favoriteData);
     };
 
     try {
       fetchFavorite(email);
     } catch (error) {
-      console.log(`fetchFavorite.error`);
+      console.log(`fetchFavorite.error`, error.message);
     }
   }, []);
 
@@ -71,7 +59,7 @@ const HomeScreenDefault = ({ navigation }) => {
       setIsLoading(true);
       fetchPosts();
     } catch (error) {
-      console.log(error);
+      console.log(`fetchPosts.error`, error.message);
     } finally {
       dispatch(stopUpdatingApp());
     }
@@ -89,20 +77,7 @@ const HomeScreenDefault = ({ navigation }) => {
       <Header navigation={navigation} />
       <Stories />
 
-      {isLoading && (
-        <ScrollView>
-          <InstagramLoader
-            active
-            listSize={4}
-            imageHeight={300}
-            primaryColor="#434446"
-            secondaryColor="#303030"
-            aSize={35}
-            sTHeight={0}
-            containerStyles={{ paddingHorizontal: 10 }}
-          />
-        </ScrollView>
-      )}
+      {isLoading && <PostsSceleton />}
       {posts.length > 0 && (
         <FlatList
           data={posts}
