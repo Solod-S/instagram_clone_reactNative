@@ -20,7 +20,7 @@ import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, favorites, setFavorites }) => {
+const Post = ({ post, navigation, favoriteData, updateData }) => {
   const {
     profile_picture,
     email,
@@ -32,7 +32,9 @@ const Post = ({ post, navigation, favorites, setFavorites }) => {
   } = post;
 
   const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
-  // const [favorites, setFavorites] = useState(favoriteData);
+  const [favorites, setFavorites] = useState(
+    favoriteData.length > 0 ? favoriteData : []
+  );
   const currenUser = useSelector((state) => state.auth.owner_uid);
   const currentUserId = useSelector((state) => state.auth.email);
   const [comments, setComments] = useState([]);
@@ -70,6 +72,7 @@ const Post = ({ post, navigation, favorites, setFavorites }) => {
           setLikes={setLikes}
           likes={likes}
           setFavorites={setFavorites}
+          updateData={updateData}
           favorites={favorites}
           currentUserId={currentUserId}
         />
@@ -130,6 +133,7 @@ const PostFooter = ({
   setFavorites,
   favorites,
   currentUserId,
+  updateData,
 }) => {
   const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
@@ -145,6 +149,11 @@ const PostFooter = ({
               email
             );
             setLikes(updatedLikes);
+            updateData(updatedLikes);
+
+            // if (updateData) {
+            //   updateData(updatedLikes);
+            // }
             // dispatch(startUpdatingApp());
           }}
         >
@@ -184,6 +193,9 @@ const PostFooter = ({
               currentUserId
             );
             setFavorites(updatedFavorites);
+            if (updateData) {
+              updateData(updatedFavorites);
+            }
           }}
         >
           <Icon

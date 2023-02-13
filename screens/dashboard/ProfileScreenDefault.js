@@ -86,6 +86,12 @@ const ProfileScreenDefault = ({ navigation }) => {
         }}
       >
         <Header navigation={navigation} />
+        <UserInfo
+          username={username}
+          postLength={posts.length}
+          profile_picture={profile_picture}
+          favorites={favorites}
+        />
         <View
           style={{
             flex: 1,
@@ -94,7 +100,7 @@ const ProfileScreenDefault = ({ navigation }) => {
           }}
         >
           <Image
-            source={require("../../assets/icons/favorites-empty.png")}
+            source={require("../../assets/icons/posts-empty.png")}
             style={{ width: 200, height: 200, marginBottom: 10 }}
           />
           <Text style={{ color: "white" }}>
@@ -132,8 +138,8 @@ const ProfileScreenDefault = ({ navigation }) => {
                 key={post.postId}
                 post={post}
                 navigation={navigation}
-                favorites={favorites}
-                setFavorites={setFavorites}
+                favoriteData={favorites}
+                // setFavorites={setFavorites}
               />
             ))}
       </ScrollView>

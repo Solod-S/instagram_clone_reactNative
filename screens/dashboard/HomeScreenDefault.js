@@ -89,8 +89,8 @@ const HomeScreenDefault = ({ navigation }) => {
               <Post
                 post={item}
                 navigation={navigation}
-                favorites={favorites}
-                setFavorites={setFavorites}
+                favoriteData={favorites}
+                // setFavorites={setFavorites}
               />
             );
           }}
