@@ -23,7 +23,12 @@ const uploadCommentSchema = yup.object().shape({
     .required(),
 });
 
-const FormikCommentUploader = ({ userIdTemp, postIdTemp, setComments }) => {
+const FormikCommentUploader = ({
+  userIdTemp,
+  postIdTemp,
+  setComments,
+  keyboardHide,
+}) => {
   const { status } = useSelector((state) => state.appUpdate);
   const dispatch = useDispatch();
   const { owner_uid, profile_picture, username, email } = useSelector(
@@ -94,6 +99,7 @@ const FormikCommentUploader = ({ userIdTemp, postIdTemp, setComments }) => {
           );
           actions.setSubmitting(false);
           actions.resetForm();
+          keyboardHide();
         } catch (error) {
           console.log(`handComments.error`, error.message);
         }

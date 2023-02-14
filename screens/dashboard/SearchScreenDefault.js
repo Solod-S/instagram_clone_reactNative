@@ -1,6 +1,12 @@
-import { SafeAreaView, FlatList, View } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { useEffect, useState, useCallback } from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  ScrollView,
+  View,
+  Text,
+  Image,
+} from "react-native";
+import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../../firebase/firebase";
@@ -10,32 +16,34 @@ import {
   getDocs,
   doc,
   getDoc,
+  where,
 } from "firebase/firestore";
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/SafeViewAndroid";
-import Header from "../../components/shared/Header";
-import Stories from "../../components/home/Stories";
+import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
-const HomeScreenDefault = ({ navigation }) => {
+const SearchScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
-  const { email } = useSelector((state) => state.auth);
+
   const { status } = useSelector((state) => state.appUpdate);
+  const { email, username, profile_picture } = useSelector(
+    (state) => state.auth
+  );
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const fetchFavorite = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData ? await currentData.favorite : [];
+      const favoriteData = currentData.favorite;
       setFavorites(favoriteData);
     };
-
     try {
       fetchFavorite(email);
     } catch (error) {
@@ -45,16 +53,18 @@ const HomeScreenDefault = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const q = query(collectionGroup(fsbase, "posts"));
+      const q = query(
+        collectionGroup(fsbase, "posts"),
+        where("email", "==", email)
+      );
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
       }));
       setIsLoading(false);
-      setPosts(posts.sort((a, b) => a.created < b.created));
+      setPosts(posts);
     };
-
     try {
       setIsLoading(true);
       fetchPosts();
@@ -65,7 +75,33 @@ const HomeScreenDefault = ({ navigation }) => {
     }
   }, [status === true]);
 
-  const keyExtractor = (item) => item?.postId;
+  if (!posts.length) {
+    return (
+      <SafeAreaView
+        style={{
+          ...SafeViewAndroid.AndroidSafeArea,
+          backgroundColor: "black",
+        }}
+      >
+        <Header navigation={navigation} />
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={require("../../assets/icons/posts-empty.png")}
+            style={{ width: 200, height: 200, marginBottom: 10 }}
+          />
+          <Text style={{ color: "white" }}>
+            You don't have any favorite posts..
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -75,33 +111,28 @@ const HomeScreenDefault = ({ navigation }) => {
       }}
     >
       <Header navigation={navigation} />
-      <Stories />
-
-      {isLoading && (
-        <View style={{ Flex: 1 }}>
-          <PostsSceleton />
-        </View>
-      )}
-      {posts.length > 0 && (
-        <FlatList
-          data={posts}
-          initialNumToRender={4}
-          showsVerticalScrollIndicator={false}
-          keyExtractor={keyExtractor}
-          renderItem={({ item }) => {
-            return (
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        // style={{ marginBottom: 50 }}
+      >
+        {isLoading && <PostsSceleton />}
+        {posts.length > 0 &&
+          posts
+            .sort((a, b) => a.created < b.created)
+            .map((post) => (
               <Post
-                post={item}
+                key={post.postId}
+                post={post}
                 navigation={navigation}
                 favoriteData={favorites}
                 // setFavorites={setFavorites}
               />
-            );
-          }}
-        />
-      )}
+            ))}
+      </ScrollView>
+
+      {/* <BottomTabs navigation={navigation} pageName="Profile" /> */}
     </SafeAreaView>
   );
 };
 
-export default HomeScreenDefault;
+export default SearchScreen;

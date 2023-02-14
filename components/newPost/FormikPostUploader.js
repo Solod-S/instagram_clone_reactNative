@@ -42,7 +42,7 @@ const FormikPostUploader = ({ navigation }) => {
     Dimensions.get("window").width - 10 * 2
   );
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [postImage, setPostImage] = useState("");
 
   useEffect(() => {
@@ -154,8 +154,15 @@ const FormikPostUploader = ({ navigation }) => {
       <Formik
         initialValues={{ caption: "" }}
         onSubmit={async (values) => {
+          Keyboard.dismiss();
+          if (loading) {
+            return;
+          }
+          setLoading(true);
           await uploadPostToServer(values.caption);
           setPostImage("");
+
+          setLoading(false);
           navigation.goBack();
         }}
         validationSchema={uploadPostSchema}
@@ -246,7 +253,7 @@ const FormikPostUploader = ({ navigation }) => {
                       fontSize: 18,
                     }}
                   >
-                    Send
+                    {loading ? "Loading..." : "Send"}
                   </Text>
                 </TouchableOpacity>
               </View>

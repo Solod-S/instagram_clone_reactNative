@@ -10,6 +10,7 @@ import FavoritesScreen from "./FavoritesScreen";
 import HomeScreen from "./HomeScreen";
 import ProfileScreen from "./ProfileScreen";
 import NewPostScreen from "./nestedScreens/NewPostScreen";
+import SearchScreen from "./SearchScreenDefault";
 
 const MainTab = createBottomTabNavigator();
 
@@ -67,7 +68,7 @@ const DashboardNavigator = ({ navigation }) => {
             />
           ),
         }}
-        component={NewPostScreen}
+        component={SearchScreen}
       />
       <MainTab.Screen
         name="FavoriteScreen"

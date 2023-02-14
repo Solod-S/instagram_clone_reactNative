@@ -5,26 +5,59 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Divider } from "@rneui/themed";
 
 import FormikCommentUploader from "./FormikCommentUploader";
 
 const AddNewComment = ({ navigation, comments, post, setComments }) => {
   const { email, postIdTemp } = post;
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  const keyboardHide = () => {
+    setKeyboardVisible(false);
+    Keyboard.dismiss();
+    console.log(`sss`);
+  };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Header navigation={navigation} />
-      <CommentsList post={post} comments={comments} />
-      <FormikCommentUploader
-        navigation={navigation}
-        userIdTemp={email}
-        postIdTemp={postIdTemp}
-        setComments={setComments}
-      />
-    </View>
+    <TouchableWithoutFeedback onPress={keyboardHide}>
+      <View style={styles.container}>
+        <Header navigation={navigation} />
+        <CommentsList post={post} comments={comments} />
+        <FormikCommentUploader
+          navigation={navigation}
+          userIdTemp={email}
+          postIdTemp={postIdTemp}
+          setComments={setComments}
+          keyboardHide={keyboardHide}
+        />
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -80,6 +113,7 @@ const About = ({ post }) => {
 
 const CommentsList = ({ post, comments }) => {
   const scrollRef = useRef(null);
+
   return (
     <>
       <ScrollView

@@ -149,7 +149,6 @@ const PostFooter = ({
               email
             );
             setLikes(updatedLikes);
-            updateData(updatedLikes);
 
             // if (updateData) {
             //   updateData(updatedLikes);
