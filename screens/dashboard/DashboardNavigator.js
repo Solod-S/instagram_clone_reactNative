@@ -56,7 +56,7 @@ const DashboardNavigator = ({ navigation }) => {
       <MainTab.Screen
         name="SearchScreen"
         options={{
-          // unmountOnBlur: true,
+          unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           tabBarIcon: ({ focused, size, color }) => (

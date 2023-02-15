@@ -103,9 +103,7 @@ const ProfileScreenDefault = ({ navigation }) => {
             source={require("../../assets/icons/posts-empty.png")}
             style={{ width: 200, height: 200, marginBottom: 10 }}
           />
-          <Text style={{ color: "white" }}>
-            You don't have any favorite posts..
-          </Text>
+          <Text style={{ color: "white" }}>You don't have any posts..</Text>
         </View>
       </SafeAreaView>
     );
