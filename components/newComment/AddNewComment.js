@@ -20,7 +20,6 @@ const AddNewComment = ({ navigation, comments, post, setComments }) => {
   const keyboardHide = () => {
     setKeyboardVisible(false);
     Keyboard.dismiss();
-    console.log(`sss`);
   };
 
   useEffect(() => {

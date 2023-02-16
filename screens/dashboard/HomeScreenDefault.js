@@ -66,7 +66,14 @@ const HomeScreenDefault = ({ navigation }) => {
   }, [status === true]);
 
   const keyExtractor = (item) => item?.postId;
-
+  const _renderitem = ({ item }) => (
+    <Post
+      post={item}
+      navigation={navigation}
+      favoriteData={favorites}
+      // setFavorites={setFavorites}
+    />
+  );
   return (
     <SafeAreaView
       style={{
@@ -88,16 +95,17 @@ const HomeScreenDefault = ({ navigation }) => {
           initialNumToRender={4}
           showsVerticalScrollIndicator={false}
           keyExtractor={keyExtractor}
-          renderItem={({ item }) => {
-            return (
-              <Post
-                post={item}
-                navigation={navigation}
-                favoriteData={favorites}
-                // setFavorites={setFavorites}
-              />
-            );
-          }}
+          // renderItem={({ item }) => {
+          //   return (
+          //     <Post
+          //       post={item}
+          //       navigation={navigation}
+          //       favoriteData={favorites}
+          //       // setFavorites={setFavorites}
+          //     />
+          //   );
+          // }}
+          renderItem={_renderitem}
         />
       )}
     </SafeAreaView>

@@ -31,11 +31,6 @@ const HomeScreen = ({ navigation, route }) => {
         name="NewCommentScreen"
         component={NewCommentScreen}
       />
-      {/* <NestedScreen.Screen
-        options={{ headerShown: false }}
-        name="NewPostScreen"
-        component={NewPostScreen}
-      /> */}
       <NestedScreen.Screen
         options={{ headerShown: false }}
         name="NewPostScreen"

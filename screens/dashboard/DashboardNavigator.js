@@ -10,7 +10,7 @@ import FavoritesScreen from "./FavoritesScreen";
 import HomeScreen from "./HomeScreen";
 import ProfileScreen from "./ProfileScreen";
 import NewPostScreen from "./nestedScreens/NewPostScreen";
-import SearchScreen from "./SearchScreenDefault";
+import SearchScreen from "./SearchScreen";
 
 const MainTab = createBottomTabNavigator();
 

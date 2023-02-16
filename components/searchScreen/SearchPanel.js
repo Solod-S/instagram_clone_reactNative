@@ -1,36 +1,58 @@
 import { View, TextInput, TouchableOpacity, Image } from "react-native";
+import { useState } from "react";
 
-const SearchPanel = () => {
+const SearchPanel = ({ handleFormSubmit, isLoading }) => {
+  const [state, setState] = useState("");
+
   return (
     <View
       style={{
-        position: "relative",
         marginHorizontal: 12,
         height: 40,
+        flexDirection: "row",
+        alignItems: "center",
+
+        marginTop: 15,
       }}
     >
       <TextInput
         style={{
-          marginTop: 15,
-          borderRadius: 12,
+          borderTopLeftRadius: 12,
+          borderBottomLeftRadius: 12,
           paddingHorizontal: 10,
           paddingRight: 40,
           fontSize: 16,
           height: 40,
+          flex: 1,
           backgroundColor: "white",
         }}
+        // onChangeText={(value) =>
+        //   setState((prevState) => ({ ...prevState, email: value }))
+        // }
+        onChangeText={(value) => setState(value)}
+        value={state}
       />
       <TouchableOpacity
-      // style={{ position: "absolute", right: 0, bottom: 0 }}
+        activeOpacity={0.7}
+        style={{
+          borderTopRightRadius: 12,
+          borderBottomRightRadius: 12,
+          height: 40,
+          width: 40,
+          backgroundColor: "white",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onPress={() => handleFormSubmit(state)}
+        // disabled={!state}
+        disabled={isLoading}
       >
         <Image
           source={require("../../assets/icons/search_icon.png")}
           style={{
             width: 32,
             height: 32,
-            position: "absolute",
-            right: 5,
-            bottom: 4,
+            // position: "absolute",
           }}
         />
       </TouchableOpacity>
