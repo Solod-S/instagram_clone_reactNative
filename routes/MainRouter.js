@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View } from "react-native";
-import { SignedInStack, SignedOutStack } from "./navigation";
+import { StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import AnimatedLoader from "react-native-animated-loader";
-import { useRef, useEffect, useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
-import { authStateChangeUsers } from "./redux/auth/authOperation";
+import { SignedInStack, SignedOutStack } from "./AuthStack";
+import { authStateChangeUsers } from "../redux/auth/authOperation";
 
-const AuthNavigation = () => {
+const MainRouter = () => {
   const { stateChange } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
-  const didMountRef = useRef(false);
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -48,4 +47,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AuthNavigation;
+export default MainRouter;

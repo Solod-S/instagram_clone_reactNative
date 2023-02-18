@@ -1,42 +1,143 @@
-import { createStackNavigator } from "@react-navigation/stack";
-import { useEffect } from "react";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
-import ProfileScreenDefault from "./ProfileScreenDefault";
-import NewCommentScreen from "./nestedScreens/NewCommentScreen";
-import NewPostScreen from "./nestedScreens/NewPostScreen";
+import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
+import { useEffect, useState, useLayoutEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
-const NestedScreen = createStackNavigator();
+import { fsbase } from "../../firebase/firebase";
+import {
+  collectionGroup,
+  query,
+  getDocs,
+  doc,
+  getDoc,
+  where,
+} from "firebase/firestore";
 
-const ProfileScreen = ({ navigation, route }) => {
-  useEffect(() => {
-    const routeName = getFocusedRouteNameFromRoute(route);
-    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen"];
-    if (tabHiddenRoutes.includes(routeName)) {
-      navigation.setOptions({ tabBarStyle: { display: "none" } });
-    } else {
-      navigation.setOptions({
-        tabBarStyle: { backgroundColor: "black", display: "flex" },
-      });
+import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+
+import SafeViewAndroid from "../../components/SafeViewAndroid";
+import Header from "../../components/profile/Header";
+import Post from "../../components/shared/Post";
+import PostsSceleton from "../../components/shared/Sceleton";
+
+import UserInfo from "../../components/profile/UserInfo";
+
+const ProfileScreen = ({ navigation }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [posts, setPosts] = useState([]);
+  const [favorites, setFavorites] = useState([]);
+
+  const { status } = useSelector((state) => state.appUpdate);
+  const { email, username, profile_picture } = useSelector(
+    (state) => state.auth
+  );
+  const dispatch = useDispatch();
+
+  useLayoutEffect(() => {
+    const fetchFavorite = async (email) => {
+      const dbRef = doc(fsbase, `users/${email}`);
+      const postsDetails = await getDoc(dbRef);
+      const currentData = postsDetails.data();
+      const favoriteData = currentData.favorite;
+      setFavorites(favoriteData);
+    };
+    try {
+      fetchFavorite(email);
+    } catch (error) {
+      console.log(`fetchFavorite.error`, error.message);
     }
-  }, [navigation, route]);
+  }, []);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const q = query(
+        collectionGroup(fsbase, "posts"),
+        where("email", "==", email)
+      );
+      const snapshot = await getDocs(q);
+      const posts = snapshot.docs.map((doc) => ({
+        ...doc.data(),
+        postIdTemp: doc.id,
+      }));
+      setIsLoading(false);
+      setPosts(posts);
+    };
+    try {
+      setIsLoading(true);
+      fetchPosts();
+    } catch (error) {
+      console.log(`fetchPosts.error`, error.message);
+    } finally {
+      dispatch(stopUpdatingApp());
+    }
+  }, [status === true]);
+
+  if (!posts.length) {
+    return (
+      <SafeAreaView
+        style={{
+          ...SafeViewAndroid.AndroidSafeArea,
+          backgroundColor: "black",
+        }}
+      >
+        <Header navigation={navigation} />
+        <UserInfo
+          username={username}
+          postLength={posts.length}
+          profile_picture={profile_picture}
+          favorites={favorites}
+        />
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Image
+            source={require("../../assets/icons/posts-empty.png")}
+            style={{ width: 200, height: 200, marginBottom: 10 }}
+          />
+          <Text style={{ color: "white" }}>You don't have any posts..</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <NestedScreen.Navigator>
-      <NestedScreen.Screen
-        options={{ headerShown: false }}
-        name="ProfileScreenDefault"
-        component={ProfileScreenDefault}
-      />
-      <NestedScreen.Screen
-        options={{ headerShown: false }}
-        name="NewCommentScreen"
-        component={NewCommentScreen}
-      />
-      <NestedScreen.Screen
-        options={{ headerShown: false }}
-        name="NewPostScreen"
-        component={NewPostScreen}
-      />
-    </NestedScreen.Navigator>
+    <SafeAreaView
+      style={{
+        ...SafeViewAndroid.AndroidSafeArea,
+        backgroundColor: "black",
+      }}
+    >
+      <Header navigation={navigation} />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        // style={{ marginBottom: 50 }}
+      >
+        <UserInfo
+          username={username}
+          postLength={posts.length}
+          profile_picture={profile_picture}
+          favorites={favorites}
+        />
+        {isLoading && <PostsSceleton />}
+        {posts.length > 0 &&
+          posts
+            .sort((a, b) => a.created < b.created)
+            .map((post) => (
+              <Post
+                key={post.postId}
+                post={post}
+                navigation={navigation}
+                favoriteData={favorites}
+                // setFavorites={setFavorites}
+              />
+            ))}
+      </ScrollView>
+
+      {/* <BottomTabs navigation={navigation} pageName="Profile" /> */}
+    </SafeAreaView>
   );
 };
 

@@ -61,7 +61,12 @@ const Post = ({ post, navigation, favoriteData, updateData }) => {
   return (
     <View style={styles.postContainer}>
       <Divider width={1} orientation="vertical" />
-      <PostHeader profile_picture={profile_picture} user={user} />
+      <PostHeader
+        profile_picture={profile_picture}
+        user={user}
+        navigation={navigation}
+        userEmail={email}
+      />
       <PostImage postImage={postImage} />
       <View style={{ marginHorizontal: 15 }}>
         <PostFooter
@@ -89,9 +94,12 @@ const Post = ({ post, navigation, favoriteData, updateData }) => {
   );
 };
 
-const PostHeader = ({ profile_picture, user }) => (
+const PostHeader = ({ profile_picture, user, navigation, userEmail }) => (
   <View style={styles.postHeaderContainer}>
-    <TouchableOpacity style={styles.postHeaderLink}>
+    <TouchableOpacity
+      style={styles.postHeaderLink}
+      onPress={() => navigation.push("UserScreen", { userEmail })}
+    >
       <Image source={{ uri: profile_picture }} style={styles.postHeaderImg} />
       <Text style={styles.postHeaderText}>{user.toLowerCase()}</Text>
     </TouchableOpacity>

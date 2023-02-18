@@ -1,11 +1,4 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  Image,
-} from "react-native";
+import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -18,6 +11,7 @@ import {
   getDoc,
   where,
 } from "firebase/firestore";
+
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/SafeViewAndroid";
@@ -27,7 +21,7 @@ import PostsSceleton from "../../components/shared/Sceleton";
 
 import UserInfo from "../../components/profile/UserInfo";
 
-const ProfileScreenDefault = ({ navigation }) => {
+const UserScreen = ({ navigation, userEmail }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
@@ -57,7 +51,7 @@ const ProfileScreenDefault = ({ navigation }) => {
     const fetchPosts = async () => {
       const q = query(
         collectionGroup(fsbase, "posts"),
-        where("email", "==", email)
+        where("email", "==", userEmail)
       );
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map((doc) => ({
@@ -147,11 +141,4 @@ const ProfileScreenDefault = ({ navigation }) => {
   );
 };
 
-export default ProfileScreenDefault;
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    flex: 1,
-  },
-});
+export default UserScreen;

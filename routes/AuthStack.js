@@ -1,10 +1,10 @@
 import { createStackNavigator } from "@react-navigation/stack";
 
-import LoginScreen from "./screens/auth/LoginScreen";
-import SignupScreen from "./screens/auth/SignupScreen";
-import ResetPasswordScreen from "./screens/auth/ResetPasswordScreen";
+import LoginScreen from "../screens/auth/LoginScreen";
+import SignupScreen from "../screens/auth/SignupScreen";
+import ResetPasswordScreen from "../screens/auth/ResetPasswordScreen";
 
-import DashboardNavigator from "./screens/dashboard/DashboardNavigator";
+import DashboardBottomTabs from "../screens/dashboard/DashboardBottomTabs";
 
 const Stack = createStackNavigator();
 const screenOption = {
@@ -15,7 +15,7 @@ const SignedInStack = () => {
   return (
     <>
       <Stack.Navigator screenOptions={screenOption}>
-        <Stack.Screen name="DashboardScreen" component={DashboardNavigator} />
+        <Stack.Screen name="DashboardScreen" component={DashboardBottomTabs} />
       </Stack.Navigator>
     </>
   );

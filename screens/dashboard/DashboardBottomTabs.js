@@ -1,20 +1,20 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import { Fontisto } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
-import FavoritesScreen from "./FavoritesScreen";
 
-//screens
-
-import HomeScreen from "./HomeScreen";
-import ProfileScreen from "./ProfileScreen";
-import NewPostScreen from "./nestedScreens/NewPostScreen";
-import SearchScreen from "./SearchScreen";
+import {
+  FavoritesStack,
+  HomeScreenStack,
+  ProfileScreenStack,
+  SearchScreenStack,
+} from "../../routes";
 
 const MainTab = createBottomTabNavigator();
 
-const DashboardNavigator = ({ navigation }) => {
+const DashboardBottomTabs = ({ navigation }) => {
   return (
     <MainTab.Navigator
       // tabBarOptions={{
@@ -35,7 +35,7 @@ const DashboardNavigator = ({ navigation }) => {
     >
       <MainTab.Screen
         name="HomeScreen"
-        component={HomeScreen}
+        component={HomeScreenStack}
         options={{
           unmountOnBlur: true,
           headerShown: false,
@@ -68,7 +68,7 @@ const DashboardNavigator = ({ navigation }) => {
             />
           ),
         }}
-        component={SearchScreen}
+        component={SearchScreenStack}
       />
       <MainTab.Screen
         name="FavoriteScreen"
@@ -85,11 +85,11 @@ const DashboardNavigator = ({ navigation }) => {
             />
           ),
         }}
-        component={FavoritesScreen}
+        component={FavoritesStack}
       />
       <MainTab.Screen
         name="ProfileScreen"
-        component={ProfileScreen}
+        component={ProfileScreenStack}
         options={{
           unmountOnBlur: true,
           headerShown: false,
@@ -110,4 +110,4 @@ const DashboardNavigator = ({ navigation }) => {
   );
 };
 
-export default DashboardNavigator;
+export default DashboardBottomTabs;
