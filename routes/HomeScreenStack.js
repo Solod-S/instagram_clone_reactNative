@@ -11,7 +11,7 @@ const HomeScreenStackNavigator = createStackNavigator();
 const HomeScreenStack = ({ navigation, route }) => {
   useEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route);
-    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen"];
+    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen", "UserScreen"];
     if (tabHiddenRoutes.includes(routeName)) {
       navigation.setOptions({ tabBarStyle: { display: "none" } });
     } else {

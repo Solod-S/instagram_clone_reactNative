@@ -11,7 +11,7 @@ const ProfileScreenStackNavigator = createStackNavigator();
 const ProfileScreenStack = ({ navigation, route }) => {
   useEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route);
-    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen"];
+    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen", "UserScreen"];
     if (tabHiddenRoutes.includes(routeName)) {
       navigation.setOptions({ tabBarStyle: { display: "none" } });
     } else {
@@ -37,7 +37,7 @@ const ProfileScreenStack = ({ navigation, route }) => {
         name="NewPostScreen"
         component={NewPostScreen}
       />
-      <HomeScreenStackNavigator.Screen
+      <ProfileScreenStackNavigator.Screen
         options={{ headerShown: false }}
         name="UserScreen"
         component={UserScreen}

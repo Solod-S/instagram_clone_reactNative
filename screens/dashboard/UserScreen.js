@@ -15,17 +15,18 @@ import {
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/SafeViewAndroid";
-import Header from "../../components/profile/Header";
+import Header from "../../components/user/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
+import UserEmptyPlaceHolder from "../../components/user/UserEmptyPlaceHolder";
+import UserInfo from "../../components/user/UserInfo";
 
-import UserInfo from "../../components/profile/UserInfo";
-
-const UserScreen = ({ navigation, userEmail }) => {
+const UserScreen = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
+  const { userEmail } = route.params;
   const { status } = useSelector((state) => state.appUpdate);
   const { email, username, profile_picture } = useSelector(
     (state) => state.auth
@@ -71,38 +72,6 @@ const UserScreen = ({ navigation, userEmail }) => {
     }
   }, [status === true]);
 
-  if (!posts.length) {
-    return (
-      <SafeAreaView
-        style={{
-          ...SafeViewAndroid.AndroidSafeArea,
-          backgroundColor: "black",
-        }}
-      >
-        <Header navigation={navigation} />
-        <UserInfo
-          username={username}
-          postLength={posts.length}
-          profile_picture={profile_picture}
-          favorites={favorites}
-        />
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../../assets/icons/posts-empty.png")}
-            style={{ width: 200, height: 200, marginBottom: 10 }}
-          />
-          <Text style={{ color: "white" }}>You don't have any posts..</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView
       style={{
@@ -111,16 +80,8 @@ const UserScreen = ({ navigation, userEmail }) => {
       }}
     >
       <Header navigation={navigation} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        // style={{ marginBottom: 50 }}
-      >
-        <UserInfo
-          username={username}
-          postLength={posts.length}
-          profile_picture={profile_picture}
-          favorites={favorites}
-        />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <UserInfo userEmail={userEmail} postLength={posts.length} />
         {isLoading && <PostsSceleton />}
         {posts.length > 0 &&
           posts
@@ -134,9 +95,8 @@ const UserScreen = ({ navigation, userEmail }) => {
                 // setFavorites={setFavorites}
               />
             ))}
+        {!posts.length && <UserEmptyPlaceHolder />}
       </ScrollView>
-
-      {/* <BottomTabs navigation={navigation} pageName="Profile" /> */}
     </SafeAreaView>
   );
 };

@@ -60,18 +60,28 @@ const AddNewComment = ({ navigation, comments, post, setComments }) => {
   );
 };
 
-const Header = ({ navigation }) => (
-  <View style={styles.headerContainer}>
-    <TouchableOpacity onPress={() => navigation.goBack()}>
-      <Image
-        source={require("../../assets/back-icon.png")}
-        style={{ width: 30, height: 30 }}
-      />
-    </TouchableOpacity>
-    <Text style={styles.headerText}>COMMENTS</Text>
-    <Text></Text>
-  </View>
-);
+const Header = ({ navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const openNewUserScreen = (userEmail) => {
+    setLoading(true);
+    navigation.goBack();
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+  return (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity onPress={() => openNewUserScreen()} disabled={loading}>
+        <Image
+          source={require("../../assets/back-icon.png")}
+          style={{ width: 30, height: 30 }}
+        />
+      </TouchableOpacity>
+      <Text style={styles.headerText}>COMMENTS</Text>
+      <Text></Text>
+    </View>
+  );
+};
 
 const About = ({ post }) => {
   const {

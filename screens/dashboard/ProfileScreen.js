@@ -19,7 +19,7 @@ import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
-import UserInfo from "../../components/profile/UserInfo";
+import UserInfo from "../../components/shared/UserInfo";
 
 const ProfileScreen = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,11 +1,4 @@
-import {
-  Image,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { Image, View, Text, StyleSheet } from "react-native";
 
 import { Divider } from "@rneui/themed";
 

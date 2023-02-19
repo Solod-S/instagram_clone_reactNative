@@ -94,21 +94,34 @@ const Post = ({ post, navigation, favoriteData, updateData }) => {
   );
 };
 
-const PostHeader = ({ profile_picture, user, navigation, userEmail }) => (
-  <View style={styles.postHeaderContainer}>
-    <TouchableOpacity
-      style={styles.postHeaderLink}
-      onPress={() => navigation.push("UserScreen", { userEmail })}
-    >
-      <Image source={{ uri: profile_picture }} style={styles.postHeaderImg} />
-      <Text style={styles.postHeaderText}>{user.toLowerCase()}</Text>
-    </TouchableOpacity>
+const PostHeader = ({ profile_picture, user, navigation, userEmail }) => {
+  const [loading, setLoading] = useState(false);
 
-    <TouchableOpacity>
-      <Text style={{ color: "white", fontWeight: "900" }}>...</Text>
-    </TouchableOpacity>
-  </View>
-);
+  const openNewUserScreen = (userEmail) => {
+    setLoading(true);
+    navigation.push("UserScreen", { userEmail });
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
+  return (
+    <View style={styles.postHeaderContainer}>
+      <TouchableOpacity
+        style={styles.postHeaderLink}
+        onPress={() => openNewUserScreen(userEmail)}
+        disabled={loading}
+      >
+        <Image source={{ uri: profile_picture }} style={styles.postHeaderImg} />
+        <Text style={styles.postHeaderText}>{user.toLowerCase()}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity>
+        <Text style={{ color: "white", fontWeight: "900" }}>...</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const PostImage = ({ postImage }) => {
   const [dimensions, setdimensions] = useState(Dimensions.get("window").width);
@@ -143,6 +156,16 @@ const PostFooter = ({
   currentUserId,
   updateData,
 }) => {
+  const [loading, setLoading] = useState(false);
+
+  const openNewCommentScreen = (comments, post) => {
+    setLoading(true);
+    navigation.push("NewCommentScreen", { comments, post });
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  };
+
   const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
   return (
@@ -175,9 +198,8 @@ const PostFooter = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
-          onPress={() =>
-            navigation.push("NewCommentScreen", { comments, post })
-          }
+          onPress={() => openNewCommentScreen(comments, post)}
+          disabled={loading}
         >
           <Icon
             imgStyle={styles.postFooterIcon}
