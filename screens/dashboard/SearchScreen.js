@@ -2,7 +2,7 @@ import { SafeAreaView, ScrollView, View, Keyboard } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fsbase } from "../../firebase/firebase";
-
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import {
   collectionGroup,
   query,
@@ -11,7 +11,7 @@ import {
   doc,
 } from "firebase/firestore";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
@@ -34,7 +34,8 @@ const SearchScreen = ({ navigation }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData.favorite;
+      // const favoriteData = currentData.favorite;
+      const favoriteData = currentData ? await currentData.favorite : [];
       setFavorites(favoriteData);
     };
     try {
@@ -67,14 +68,13 @@ const SearchScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const storage = getStorage();
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
-
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
       }));
-
       const filteredPost = posts.filter(
         (doc) =>
           doc.caption
@@ -84,8 +84,27 @@ const SearchScreen = ({ navigation }) => {
           doc.user.toLowerCase() === searchQuery.toLowerCase()
       );
 
+      const result = await Promise.all(
+        filteredPost.map(async (item) => {
+          const photoUri = await getDownloadURL(
+            ref(storage, `avatarsImage/${email}`)
+          )
+            .then((url) => {
+              return url;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
+          return {
+            ...item,
+            profile_picture: photoUri,
+          };
+        })
+      );
+
       setIsLoading(false);
-      setPosts(filteredPost);
+      setPosts(result);
     };
     try {
       if (searchQuery) {

@@ -1,6 +1,6 @@
 import { SafeAreaView } from "react-native";
 
-import SafeViewAndroid from "../../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 
 import AddNewPost from "../../../components/newPost/AddNewPost";
 

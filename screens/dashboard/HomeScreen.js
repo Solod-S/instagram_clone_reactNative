@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../../firebase/firebase";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import {
   collectionGroup,
   query,
@@ -13,7 +14,7 @@ import {
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Stories from "../../components/home/Stories";
 import Post from "../../components/shared/Post";
@@ -45,12 +46,28 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const storage = getStorage();
+
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
-      const posts = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        postIdTemp: doc.id,
-      }));
+      const posts = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const photoUri = await getDownloadURL(
+            ref(storage, `avatarsImage/${email}`)
+          )
+            .then((url) => {
+              return url;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          return {
+            ...doc.data(),
+            postIdTemp: doc.id,
+            profile_picture: photoUri,
+          };
+        })
+      );
       setIsLoading(false);
       setPosts(posts.sort((a, b) => a.created < b.created));
     };

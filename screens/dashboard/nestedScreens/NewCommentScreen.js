@@ -5,8 +5,9 @@ import { useEffect, useState, useRef } from "react";
 import { fsbase } from "../../../firebase/firebase";
 import "firebase/compat/firestore";
 import { collection, query, getDocs } from "firebase/firestore";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
-import SafeViewAndroid from "../../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import AddNewComment from "../../../components/newComment/AddNewComment";
 
 const NewCommentScreen = ({ navigation, route }) => {
@@ -17,14 +18,31 @@ const NewCommentScreen = ({ navigation, route }) => {
   useEffect(() => {
     prevCommentsRef.current = comments;
     const fetchComments = async (email, postIdTemp) => {
+      const storage = getStorage();
+
       const q = query(
         collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
       );
       const snapshot = await getDocs(q);
-      const newComments = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        commentIdTemp: doc.id,
-      }));
+      const newComments = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const photoUri = await getDownloadURL(
+            ref(storage, `avatarsImage/${email}`)
+          )
+            .then((url) => {
+              return url;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const result = {
+            ...doc.data(),
+            commentIdTemp: doc.id,
+            profile_picture: photoUri,
+          };
+          return result;
+        })
+      );
       const sortedComments = newComments.sort((a, b) => b.created < a.created);
 
       if (prevCommentsRef.current.length !== sortedComments.length) {

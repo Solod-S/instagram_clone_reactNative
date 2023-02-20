@@ -8,7 +8,7 @@ import {
 import { SafeAreaView } from "react-native";
 import { useState, useEffect } from "react";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import SignupForm from "../../components/signUpScreen/SignUp";
 
 const SignupScreen = ({ navigation }) => {

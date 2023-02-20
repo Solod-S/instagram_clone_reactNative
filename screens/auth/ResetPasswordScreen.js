@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native";
 import { useState, useEffect } from "react";
 
 import ResetForm from "../../components/resetPasswordScreen/ResetForm";
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 
 const ResetPasswordScreen = ({ navigation }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);

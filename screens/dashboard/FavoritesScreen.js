@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../../firebase/firebase";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import {
   collectionGroup,
   query,
@@ -21,14 +22,13 @@ import {
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
 const FavoritesScreen = ({ navigation }) => {
-  const [showPlaceholder, setShowPlaceholder] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const { email } = useSelector((state) => state.auth);
@@ -36,17 +36,17 @@ const FavoritesScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchFavorite = async (email) => {
+    const fetchFavoritesData = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData.favorite;
+      // const favoriteData = currentData.favorite;
+      const favoriteData = currentData ? await currentData.favorite : [];
       setFavorites(favoriteData);
-      handlePlaceHolder(favoriteData);
     };
 
     try {
-      fetchFavorite(email);
+      fetchFavoritesData(email);
     } catch (error) {
       console.log(`fetchFavorite.error`, error.message);
     } finally {
@@ -56,14 +56,30 @@ const FavoritesScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchFavoritePost = async (id) => {
+      const storage = getStorage();
       const postsCollection = collectionGroup(fsbase, "posts");
       const q = query(postsCollection, where("postId", "==", id));
 
       const snapshot = await getDocs(q);
-      const posts = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        postIdTemp: doc.id,
-      }));
+      const posts = await Promise.all(
+        snapshot.docs.map(async (doc) => {
+          const photoUri = await getDownloadURL(
+            ref(storage, `avatarsImage/${email}`)
+          )
+            .then((url) => {
+              return url;
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+
+          return {
+            ...doc.data(),
+            postIdTemp: doc.id,
+            profile_picture: photoUri,
+          };
+        })
+      );
 
       return posts[0];
     };
@@ -75,7 +91,6 @@ const FavoritesScreen = ({ navigation }) => {
 
       setPosts(favoriteList.sort((a, b) => a.created < b.created));
       setIsLoading(false);
-      handlePlaceHolder(favoriteList);
     };
 
     try {
@@ -90,39 +105,6 @@ const FavoritesScreen = ({ navigation }) => {
 
   const keyExtractor = (item) => item?.postId;
 
-  const handlePlaceHolder = (favoriteList) => {
-    favoriteList.length > 0
-      ? setShowPlaceholder(false)
-      : setShowPlaceholder(true);
-  };
-  if (showPlaceholder) {
-    return (
-      <SafeAreaView
-        style={{
-          ...SafeViewAndroid.AndroidSafeArea,
-          backgroundColor: "black",
-        }}
-      >
-        <Header navigation={navigation} />
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../../assets/icons/favorites-empty.png")}
-            style={{ width: 200, height: 200, marginBottom: 10 }}
-          />
-          <Text style={{ color: "white" }}>
-            You don't have any favorite posts..
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView
       style={{
@@ -133,6 +115,7 @@ const FavoritesScreen = ({ navigation }) => {
       <Header navigation={navigation} />
 
       {isLoading && <PostsSceleton />}
+
       {posts.length > 0 && !isLoading && (
         <FlatList
           data={posts}
@@ -150,6 +133,25 @@ const FavoritesScreen = ({ navigation }) => {
             );
           }}
         />
+      )}
+      {favorites.length <= 0 && posts.length <= 0 && !isLoading && (
+        <>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../assets/icons/favorites-empty.png")}
+              style={{ width: 200, height: 200, marginBottom: 10 }}
+            />
+            <Text style={{ color: "white" }}>
+              You don't have any favorite posts..
+            </Text>
+          </View>
+        </>
       )}
     </SafeAreaView>
   );

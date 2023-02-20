@@ -3,6 +3,8 @@ import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../../firebase/firebase";
+
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import {
   collectionGroup,
   query,
@@ -14,7 +16,7 @@ import {
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/user/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
@@ -38,7 +40,8 @@ const UserScreen = ({ navigation, route }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData.favorite;
+      // const favoriteData = currentData.favorite;
+      const favoriteData = currentData ? await currentData.favorite : [];
       setFavorites(favoriteData);
     };
     try {
@@ -50,6 +53,16 @@ const UserScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const storage = getStorage();
+      const photoUri = await getDownloadURL(
+        ref(storage, `avatarsImage/${email}`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       const q = query(
         collectionGroup(fsbase, "posts"),
         where("email", "==", userEmail)
@@ -58,6 +71,7 @@ const UserScreen = ({ navigation, route }) => {
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
+        profile_picture: photoUri,
       }));
       setIsLoading(false);
       setPosts(posts);

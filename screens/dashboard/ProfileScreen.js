@@ -12,35 +12,49 @@ import {
   where,
 } from "firebase/firestore";
 
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
+import { authSlice } from "../../redux/auth/authReducer";
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
-import SafeViewAndroid from "../../components/SafeViewAndroid";
+import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
-import UserInfo from "../../components/shared/UserInfo";
+import UserInfo from "../../components/profile/UserInfo";
+import UserInfoEditor from "../../components/profile/UserInfoEditor";
 
 const ProfileScreen = ({ navigation }) => {
+  const [editorMode, seteditorMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState([]);
 
   const { status } = useSelector((state) => state.appUpdate);
-  const { email, username, profile_picture } = useSelector(
+  const { email, username, profile_picture, user_about } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
+    const fetchUserData = async () => {
+      const { updateUserInfo } = authSlice.actions;
+      const dbRef = doc(fsbase, `users/${email}`);
+      const userDetails = await getDoc(dbRef);
+      const currentData = userDetails.data();
+      const user_about = currentData.user_about;
+      dispatch(updateUserInfo({ user_about }));
+    };
     const fetchFavorite = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
-      const favoriteData = currentData.favorite;
+      const favoriteData = currentData ? await currentData.favorite : [];
       setFavorites(favoriteData);
     };
     try {
+      fetchUserData();
       fetchFavorite(email);
     } catch (error) {
       console.log(`fetchFavorite.error`, error.message);
@@ -49,6 +63,16 @@ const ProfileScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
+      const storage = getStorage();
+      const photoUri = await getDownloadURL(
+        ref(storage, `avatarsImage/${email}`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       const q = query(
         collectionGroup(fsbase, "posts"),
         where("email", "==", email)
@@ -57,6 +81,7 @@ const ProfileScreen = ({ navigation }) => {
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
+        profile_picture: photoUri,
       }));
       setIsLoading(false);
       setPosts(posts);
@@ -71,38 +96,6 @@ const ProfileScreen = ({ navigation }) => {
     }
   }, [status === true]);
 
-  if (!posts.length) {
-    return (
-      <SafeAreaView
-        style={{
-          ...SafeViewAndroid.AndroidSafeArea,
-          backgroundColor: "black",
-        }}
-      >
-        <Header navigation={navigation} />
-        <UserInfo
-          username={username}
-          postLength={posts.length}
-          profile_picture={profile_picture}
-          favorites={favorites}
-        />
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Image
-            source={require("../../assets/icons/posts-empty.png")}
-            style={{ width: 200, height: 200, marginBottom: 10 }}
-          />
-          <Text style={{ color: "white" }}>You don't have any posts..</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
   return (
     <SafeAreaView
       style={{
@@ -111,19 +104,53 @@ const ProfileScreen = ({ navigation }) => {
       }}
     >
       <Header navigation={navigation} />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        // style={{ marginBottom: 50 }}
-      >
+      {!editorMode ? (
         <UserInfo
+          seteditorMode={seteditorMode}
           username={username}
           postLength={posts.length}
           profile_picture={profile_picture}
           favorites={favorites}
+          user_about={user_about}
         />
-        {isLoading && <PostsSceleton />}
-        {posts.length > 0 &&
-          posts
+      ) : (
+        <UserInfoEditor
+          seteditorMode={seteditorMode}
+          username={username}
+          email={email}
+          postLength={posts.length}
+          profile_picture={profile_picture}
+          favorites={favorites}
+          user_about={user_about}
+        />
+      )}
+      {isLoading && (
+        <>
+          <PostsSceleton />
+        </>
+      )}
+
+      {posts.length <= 0 && !isLoading && (
+        <>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              source={require("../../assets/icons/posts-empty.png")}
+              style={{ width: 200, height: 200, marginBottom: 10 }}
+            />
+            <Text style={{ color: "white" }}>You don't have any posts..</Text>
+          </View>
+        </>
+      )}
+
+      {!isLoading && posts.length > 0 && (
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
               <Post
@@ -134,9 +161,8 @@ const ProfileScreen = ({ navigation }) => {
                 // setFavorites={setFavorites}
               />
             ))}
-      </ScrollView>
-
-      {/* <BottomTabs navigation={navigation} pageName="Profile" /> */}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

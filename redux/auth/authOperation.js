@@ -9,7 +9,7 @@ import {
   getAuth,
   getDoc,
 } from "firebase/auth";
-
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../../firebase/firebase";
 import { fsbase } from "../../firebase/firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
@@ -32,9 +32,10 @@ export const authSignUpUser =
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       const randomPhoto = await getRandomProfilePicture();
+      const photo = await uploadPhotoToServer(randomPhoto, email);
       await updateProfile(auth.currentUser, {
         displayName: login,
-        photoURL: randomPhoto,
+        photoURL: photo,
       });
 
       const { uid, displayName, photoURL } = auth.currentUser;
@@ -44,7 +45,7 @@ export const authSignUpUser =
         owner_uid: uid,
         login: login,
         email: email,
-        profile_picture: randomPhoto,
+        profile_picture: photo,
         favorite: [],
         subscription: "starter",
       });
@@ -59,6 +60,16 @@ export const authSignUpUser =
       );
     } catch (error) {
       console.log("error.message.sign-up:", error.message);
+
+      switch (error.message) {
+        case "Firebase: Error (auth/email-already-in-use).":
+          Alert.alert("This email already in use");
+          break;
+
+        default:
+          Alert.alert(error.message);
+          break;
+      }
     }
   };
 
@@ -128,4 +139,23 @@ export const authStateChangeUsers = () => async (dispatch) => {
       console.log("error.message.state-change:", error.message);
     }
   });
+};
+
+const uploadPhotoToServer = async (photo, email) => {
+  const storage = getStorage();
+  const storageRef = ref(storage, `avatarsImage/${email}`);
+
+  const response = await fetch(photo);
+  const file = await response.blob();
+  console.log(file, typeof file);
+  const uploadPhoto = await uploadBytes(storageRef, file).then(() => {});
+
+  const photoUri = await getDownloadURL(ref(storage, `avatarsImage/${email}`))
+    .then((url) => {
+      return url;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  return photoUri;
 };
