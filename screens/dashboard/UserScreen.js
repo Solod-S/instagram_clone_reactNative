@@ -30,7 +30,7 @@ const UserScreen = ({ navigation, route }) => {
 
   const { userEmail } = route.params;
   const { status } = useSelector((state) => state.appUpdate);
-  const { email, username, profile_picture } = useSelector(
+  const { email, username, profile_picture, subscribe_list } = useSelector(
     (state) => state.auth
   );
   const dispatch = useDispatch();
@@ -95,7 +95,11 @@ const UserScreen = ({ navigation, route }) => {
     >
       <Header navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <UserInfo userEmail={userEmail} postLength={posts.length} />
+        <UserInfo
+          userEmail={userEmail}
+          postLength={posts.length}
+          subscribe_list={subscribe_list}
+        />
         {isLoading && <PostsSceleton />}
         {posts.length > 0 &&
           posts

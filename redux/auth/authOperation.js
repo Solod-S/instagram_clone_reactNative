@@ -31,11 +31,23 @@ export const authSignUpUser =
   async (dispatch) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      const randomPhoto = await getRandomProfilePicture();
-      const photo = await uploadPhotoToServer(randomPhoto, email);
+      // const randomPhoto = await getRandomProfilePicture();
+
+      const storage = getStorage();
+      const photoUri = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      console.log(photoUri);
+      // const photo = await uploadPhotoToServer(avatar, email);
       await updateProfile(auth.currentUser, {
         displayName: login,
-        photoURL: photo,
+        photoURL: photoUri,
       });
 
       const { uid, displayName, photoURL } = auth.currentUser;
@@ -45,9 +57,10 @@ export const authSignUpUser =
         owner_uid: uid,
         login: login,
         email: email,
-        profile_picture: photo,
+        profile_picture: photoUri,
         favorite: [],
         subscription: "starter",
+        subscribe_list: [],
       });
 
       dispatch(
@@ -55,7 +68,9 @@ export const authSignUpUser =
           owner_uid: uid,
           login,
           email,
-          profile_picture: randomPhoto,
+          profile_picture: photoUri,
+          subscribe_list: [],
+          favorite: [],
         })
       );
     } catch (error) {
@@ -87,6 +102,8 @@ export const authSignInUser =
           login: displayName,
           email,
           profile_picture: photoURL,
+          subscribe_list: [],
+          favorite: [],
         })
       );
     } catch (error) {
@@ -139,23 +156,4 @@ export const authStateChangeUsers = () => async (dispatch) => {
       console.log("error.message.state-change:", error.message);
     }
   });
-};
-
-const uploadPhotoToServer = async (photo, email) => {
-  const storage = getStorage();
-  const storageRef = ref(storage, `avatarsImage/${email}`);
-
-  const response = await fetch(photo);
-  const file = await response.blob();
-  console.log(file, typeof file);
-  const uploadPhoto = await uploadBytes(storageRef, file).then(() => {});
-
-  const photoUri = await getDownloadURL(ref(storage, `avatarsImage/${email}`))
-    .then((url) => {
-      return url;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-  return photoUri;
 };

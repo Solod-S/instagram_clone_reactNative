@@ -43,6 +43,7 @@ const ProfileScreen = ({ navigation }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const userDetails = await getDoc(dbRef);
       const currentData = userDetails.data();
+
       const user_about = currentData.user_about;
       dispatch(updateUserInfo({ user_about }));
     };
@@ -64,6 +65,16 @@ const ProfileScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchPosts = async () => {
       const storage = getStorage();
+      const def_avatar = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       const photoUri = await getDownloadURL(
         ref(storage, `avatarsImage/${email}`)
       )
@@ -71,7 +82,7 @@ const ProfileScreen = ({ navigation }) => {
           return url;
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
         });
       const q = query(
         collectionGroup(fsbase, "posts"),
@@ -81,7 +92,7 @@ const ProfileScreen = ({ navigation }) => {
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
-        profile_picture: photoUri,
+        profile_picture: photoUri ? photoUri : def_avatar,
       }));
       setIsLoading(false);
       setPosts(posts);

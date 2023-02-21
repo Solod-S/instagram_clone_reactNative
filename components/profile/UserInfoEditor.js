@@ -96,12 +96,12 @@ const UserInfoEditor = ({
       // const currentData = userDetails.data();
 
       await updateDoc(dbRef, {
-        user_about: state.description ? state.description : "",
-        profile_picture: avatarUri ? avatarUri : null,
+        user_about: state.description ? state.description.trim() : "",
+        profile_picture: avatarUri ? avatarUri : profile_picture,
       });
       dispatch(
         updateUserInfo({
-          user_about: state.description ? state.description : "",
+          user_about: state.description ? state.description.trim() : "",
           profile_picture: avatarUri ? avatarUri : profile_picture,
         })
       );
@@ -112,7 +112,7 @@ const UserInfoEditor = ({
       seteditorMode(false);
       dispatch(startUpdatingApp());
     } catch (error) {
-      console.log(`submit.error`, submit.message);
+      console.log(`submit.error`, error.message);
     }
   };
   return (

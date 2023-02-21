@@ -47,7 +47,15 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchPosts = async () => {
       const storage = getStorage();
-
+      const def_avatar = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
       const posts = await Promise.all(
@@ -59,12 +67,12 @@ const HomeScreen = ({ navigation }) => {
               return url;
             })
             .catch((error) => {
-              console.log(error);
+              // console.log(error);
             });
           return {
             ...doc.data(),
             postIdTemp: doc.id,
-            profile_picture: photoUri,
+            profile_picture: photoUri ? photoUri : def_avatar,
           };
         })
       );

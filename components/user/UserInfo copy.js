@@ -6,12 +6,11 @@ import { Divider } from "@rneui/themed";
 import { fsbase } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-import { Ionicons } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
+const UserInfo = ({ postLength, userEmail }) => {
   const [state, setState] = useState({});
-  console.log(subscribe_list);
+
   useEffect(() => {
     const fetchFavorite = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
@@ -45,59 +44,31 @@ const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
           </View>
         </View>
 
-        <View style={{ flex: 1 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              flex: 1,
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={styles.infoContainer}>
-              <Text style={styles.number}>{postLength}</Text>
-              <Text style={styles.description}>pos...</Text>
-            </View>
-            <View style={styles.infoContainer}>
-              {state.favorite ? (
-                <Text style={styles.number}>{state.favorite.length}</Text>
-              ) : (
-                <Text style={styles.number}>0</Text>
-              )}
-              <Text style={styles.description}>fav...</Text>
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.number}>0</Text>
-              <Text style={styles.description}>sub...</Text>
-            </View>
+        <View
+          style={{
+            flexDirection: "row",
+            flex: 1,
+            justifyContent: "space-around",
+          }}
+        >
+          <View style={styles.infoContainer}>
+            <Text style={styles.number}>{postLength}</Text>
+            <Text style={styles.description}>pos...</Text>
           </View>
-          {/* !!!! */}
-          {subscribe_list.includes(userEmail) ? (
-            <TouchableOpacity
-              style={{
-                marginLeft: "auto",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-              // onPress={() => seteditorMode(true)}
-            >
-              <Ionicons name="person-add" size={24} color="white" />
-              <Text style={{ color: "white", fontSize: 16 }}> SUBSCRIBE</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={{
-                marginLeft: "auto",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-              // onPress={() => seteditorMode(true)}
-            >
-              <Ionicons name="person-remove" size={24} color="white" />
-              <Text style={{ color: "white", fontSize: 16 }}> UNSUBSCRIBE</Text>
-            </TouchableOpacity>
-          )}
+          <View style={styles.infoContainer}>
+            {state.favorite ? (
+              <Text style={styles.number}>{state.favorite.length}</Text>
+            ) : (
+              <Text style={styles.number}>0</Text>
+            )}
+            <Text style={styles.description}>fav...</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.number}>0</Text>
+            <Text style={styles.description}>sub...</Text>
+          </View>
         </View>
-        <Divider width={0.2} orientation="vertical" />
+        <Divider width={0.2} orientation="vertical" style={{ marginTop: 5 }} />
       </View>
       {state.user_about && (
         <Text style={{ color: "white", marginBottom: 5 }}>
