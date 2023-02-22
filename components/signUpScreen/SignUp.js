@@ -42,7 +42,7 @@ const SignupForm = ({ navigation }) => {
         email,
         password,
       };
-
+      console.log(`newUser`, newUser);
       dispatch(authSignUpUser(newUser));
     } catch (error) {
       Alert.alert("Oops...something went wrong, please try again later");

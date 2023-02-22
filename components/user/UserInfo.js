@@ -7,24 +7,24 @@ import { fsbase } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 import { Ionicons } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
-  const [state, setState] = useState({});
-  console.log(subscribe_list);
-  useEffect(() => {
-    const fetchFavorite = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
-      setState(currentData);
-    };
-    try {
-      fetchFavorite(userEmail);
-    } catch (error) {
-      console.log(`fetchFavorite.error`, error.message);
-    }
-  }, []);
+const UserInfo = ({ postLength, userEmail, state }) => {
+  // const [state, setState] = useState({});
+  // useEffect(() => {
+  //   const fetchFavorite = async (email) => {
+  //     const dbRef = doc(fsbase, `users/${email}`);
+  //     const postsDetails = await getDoc(dbRef);
+  //     const currentData = postsDetails.data();
+  //     console.log(currentData.subscribe_list.includes(userEmail));
+  //     setState(currentData);
+  //     console.log(state, userEmail);
+  //   };
+  //   try {
+  //     fetchFavorite(userEmail);
+  //   } catch (error) {
+  //     console.log(`fetchFavorite.error`, error.message);
+  //   }
+  // }, []);
 
   return (
     <View style={{ paddingHorizontal: 20 }}>
@@ -71,7 +71,7 @@ const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
             </View>
           </View>
           {/* !!!! */}
-          {subscribe_list.includes(userEmail) ? (
+          {state ?? state.subscribe_list.includes(userEmail) ? (
             <TouchableOpacity
               style={{
                 marginLeft: "auto",
@@ -80,8 +80,8 @@ const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
               }}
               // onPress={() => seteditorMode(true)}
             >
-              <Ionicons name="person-add" size={24} color="white" />
-              <Text style={{ color: "white", fontSize: 16 }}> SUBSCRIBE</Text>
+              <Ionicons name="person-add" size={22} color="white" />
+              <Text style={{ color: "white", fontSize: 12 }}> SUBSCRIBE</Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -92,8 +92,8 @@ const UserInfo = ({ postLength, userEmail, subscribe_list }) => {
               }}
               // onPress={() => seteditorMode(true)}
             >
-              <Ionicons name="person-remove" size={24} color="white" />
-              <Text style={{ color: "white", fontSize: 16 }}> UNSUBSCRIBE</Text>
+              <Ionicons name="person-remove" size={22} color="white" />
+              <Text style={{ color: "white", fontSize: 12 }}> UNSUBSCRIBE</Text>
             </TouchableOpacity>
           )}
         </View>

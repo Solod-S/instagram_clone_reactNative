@@ -38,6 +38,7 @@ const FormikPostUploader = ({ navigation }) => {
   const { owner_uid, username, email, profile_picture } = useSelector(
     (state) => state.auth
   );
+
   const [dimensions, setdimensions] = useState(
     Dimensions.get("window").width - 10 * 2
   );

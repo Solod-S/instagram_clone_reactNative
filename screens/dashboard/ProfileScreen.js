@@ -26,15 +26,15 @@ import UserInfo from "../../components/profile/UserInfo";
 import UserInfoEditor from "../../components/profile/UserInfoEditor";
 
 const ProfileScreen = ({ navigation }) => {
+  const { email, username, profile_picture, favorite, user_about } =
+    useSelector((state) => state.auth);
+  const { status } = useSelector((state) => state.appUpdate);
+
   const [editorMode, seteditorMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(favorite ? favorite : []);
 
-  const { status } = useSelector((state) => state.appUpdate);
-  const { email, username, profile_picture, user_about } = useSelector(
-    (state) => state.auth
-  );
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -44,23 +44,21 @@ const ProfileScreen = ({ navigation }) => {
       const userDetails = await getDoc(dbRef);
       const currentData = userDetails.data();
 
-      const user_about = currentData.user_about;
-      dispatch(updateUserInfo({ user_about }));
+      // const { user_about, subscribe_list, favorite } = currentData;
+
+      // dispatch(updateUserInfo({ user_about, subscribe_list, favorite }));
     };
-    const fetchFavorite = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
-      const favoriteData = currentData ? await currentData.favorite : [];
-      setFavorites(favoriteData);
-    };
+
     try {
       fetchUserData();
-      fetchFavorite(email);
     } catch (error) {
       console.log(`fetchFavorite.error`, error.message);
     }
   }, []);
+
+  useEffect(() => {
+    setFavorites(favorite);
+  }, [favorite]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -169,7 +167,7 @@ const ProfileScreen = ({ navigation }) => {
                 post={post}
                 navigation={navigation}
                 favoriteData={favorites}
-                // setFavorites={setFavorites}
+                setFavorites={setFavorites}
               />
             ))}
         </ScrollView>

@@ -24,15 +24,16 @@ import UserEmptyPlaceHolder from "../../components/user/UserEmptyPlaceHolder";
 import UserInfo from "../../components/user/UserInfo";
 
 const UserScreen = ({ navigation, route }) => {
+  const { userEmail } = route.params;
+
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(favorite ? favorite : []);
+  const [userData, setUserData] = useState({});
 
-  const { userEmail } = route.params;
   const { status } = useSelector((state) => state.appUpdate);
-  const { email, username, profile_picture, subscribe_list } = useSelector(
-    (state) => state.auth
-  );
+  const { email, username, profile_picture, subscribe_list, favorite } =
+    useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
@@ -40,9 +41,10 @@ const UserScreen = ({ navigation, route }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
+      setUserData(currentData);
       // const favoriteData = currentData.favorite;
-      const favoriteData = currentData ? await currentData.favorite : [];
-      setFavorites(favoriteData);
+      // const favoriteData = currentData ? await currentData.favorite : [];
+      // setFavorites(favoriteData);
     };
     try {
       fetchFavorite(email);
@@ -54,6 +56,16 @@ const UserScreen = ({ navigation, route }) => {
   useEffect(() => {
     const fetchPosts = async () => {
       const storage = getStorage();
+      const def_avatar = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       const photoUri = await getDownloadURL(
         ref(storage, `avatarsImage/${email}`)
       )
@@ -61,7 +73,7 @@ const UserScreen = ({ navigation, route }) => {
           return url;
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
         });
       const q = query(
         collectionGroup(fsbase, "posts"),
@@ -71,7 +83,7 @@ const UserScreen = ({ navigation, route }) => {
       const posts = snapshot.docs.map((doc) => ({
         ...doc.data(),
         postIdTemp: doc.id,
-        profile_picture: photoUri,
+        profile_picture: photoUri ? photoUri : def_avatar,
       }));
       setIsLoading(false);
       setPosts(posts);
@@ -98,7 +110,7 @@ const UserScreen = ({ navigation, route }) => {
         <UserInfo
           userEmail={userEmail}
           postLength={posts.length}
-          subscribe_list={subscribe_list}
+          state={userData}
         />
         {isLoading && <PostsSceleton />}
         {posts.length > 0 &&
@@ -109,7 +121,8 @@ const UserScreen = ({ navigation, route }) => {
                 key={post.postId}
                 post={post}
                 navigation={navigation}
-                favoriteData={favorites}
+                favoriteData={favorite}
+                setFavorites={setFavorites}
                 // setFavorites={setFavorites}
               />
             ))}

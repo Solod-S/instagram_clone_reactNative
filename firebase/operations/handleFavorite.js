@@ -15,6 +15,7 @@ const handleFavorite = async (currentFavorite, userIdTemp) => {
     });
 
     const result = [...currentData.favorite, currentFavorite];
+
     return result;
   } else {
     await updateDoc(dbRef, {

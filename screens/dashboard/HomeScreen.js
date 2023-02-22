@@ -21,28 +21,16 @@ import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
 const HomeScreen = ({ navigation }) => {
+  const { email, favorite, subscribe_list, user_about, profile_picture } =
+    useSelector((state) => state.auth);
+  const { status } = useSelector((state) => state.appUpdate);
+  const authUser = useSelector((state) => state.auth);
+
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const { email } = useSelector((state) => state.auth);
-  const { status } = useSelector((state) => state.appUpdate);
+  const [favorites, setFavorites] = useState(favorite ? favorite : []);
+
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    const fetchFavorite = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
-      const favoriteData = currentData ? await currentData.favorite : [];
-      setFavorites(favoriteData);
-    };
-
-    try {
-      fetchFavorite(email);
-    } catch (error) {
-      console.log(`fetchFavorite.error`, error.message);
-    }
-  }, []);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -61,7 +49,7 @@ const HomeScreen = ({ navigation }) => {
       const posts = await Promise.all(
         snapshot.docs.map(async (doc) => {
           const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${email}`)
+            ref(storage, `avatarsImage/${doc.data().email}`)
           )
             .then((url) => {
               return url;
@@ -90,13 +78,17 @@ const HomeScreen = ({ navigation }) => {
     }
   }, [status === true]);
 
+  useEffect(() => {
+    setFavorites(favorite);
+  }, [favorite]);
+
   const keyExtractor = (item) => item?.postId;
   const _renderitem = ({ item }) => (
     <Post
       post={item}
       navigation={navigation}
       favoriteData={favorites}
-      // setFavorites={setFavorites}
+      setFavorites={setFavorites}
     />
   );
   return (

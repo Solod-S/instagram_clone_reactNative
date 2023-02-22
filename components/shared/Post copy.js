@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { useIsFocused, useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
 import { memo } from "react";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -58,6 +56,10 @@ const Post = ({ post, navigation, favoriteData, setFavorites }) => {
       console.log(`fetchComments.error`, error.message);
     }
   }, [post, favoriteData]);
+
+  useEffect(() => {
+    console.log("likes");
+  }, [likes]);
 
   return (
     <View style={styles.postContainer}>
@@ -155,36 +157,8 @@ const PostFooter = ({
   favorites,
   currentUserId,
 }) => {
-  const [activeLikeIcon, setActiveLikeIcon] = useState(
-    postFooterIcons[0].image
-  );
   const [loading, setLoading] = useState(false);
-  const isFocused = useIsFocused();
-  useEffect(() => {
-    if (isFocused) {
-      console.log(activeLikeIcon);
-      !likes.includes(currenUser)
-        ? setActiveLikeIcon(postFooterIcons[0].image)
-        : setActiveLikeIcon(postFooterIcons[0].imageActive);
-    }
-  }, [isFocused, likes]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const unsubscribe = showIcon();
-  //     return () => unsubscribe();
-  //   }, [likes])
-  // );
-
-  function showIcon() {
-    console.log(likes);
-    !likes.includes(currenUser)
-      ? setActiveLikeIcon(false)
-      : setActiveLikeIcon(true);
-    // return !likes.includes(currenUser)
-    //   ? postFooterIcons[0].image
-    //   : postFooterIcons[0].imageActive;
-  }
   const openNewCommentScreen = (comments, post) => {
     setLoading(true);
     navigation.push("NewCommentScreen", { comments, post });
@@ -195,7 +169,11 @@ const PostFooter = ({
 
   const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
-
+  const check = (likes) => {
+    return !likes.includes(currenUser)
+      ? postFooterIcons[0].image
+      : postFooterIcons[0].imageActive;
+  };
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <View style={styles.postFooterLeftContainer}>
@@ -217,20 +195,8 @@ const PostFooter = ({
             //     ? postFooterIcons[0].image
             //     : postFooterIcons[0].imageActive
             // }
-            imgUrl={activeLikeIcon}
+            imgUrl={check()}
           />
-          {/* {activeLikeIcon && (
-            <Icon
-              imgStyle={styles.postFooterIcon}
-              imgUrl={postFooterIcons[0].imageActive}
-            />
-          )}
-          {!activeLikeIcon && (
-            <Icon
-              imgStyle={styles.postFooterIcon}
-              imgUrl={postFooterIcons[0].image}
-            />
-          )} */}
         </TouchableOpacity>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}

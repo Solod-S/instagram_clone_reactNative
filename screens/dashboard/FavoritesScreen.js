@@ -28,35 +28,32 @@ import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
 const FavoritesScreen = ({ navigation }) => {
+  const { email, favorite, subscribe_list, user_about, profile_picture } =
+    useSelector((state) => state.auth);
+  const { status } = useSelector((state) => state.appUpdate);
+
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
-  const { email } = useSelector((state) => state.auth);
-  const { status } = useSelector((state) => state.appUpdate);
+  const [favorites, setFavorites] = useState(favorite ? favorite : []);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchFavoritesData = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
-      // const favoriteData = currentData.favorite;
-      const favoriteData = currentData ? await currentData.favorite : [];
-      setFavorites(favoriteData);
-    };
-
-    try {
-      fetchFavoritesData(email);
-    } catch (error) {
-      console.log(`fetchFavorite.error`, error.message);
-    } finally {
-      dispatch(stopUpdatingApp());
-    }
-  }, [status === true]);
+    setFavorites(favorite);
+  }, [favorite]);
 
   useEffect(() => {
     const fetchFavoritePost = async (id) => {
       const storage = getStorage();
+      const def_avatar = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       const postsCollection = collectionGroup(fsbase, "posts");
       const q = query(postsCollection, where("postId", "==", id));
 
@@ -70,13 +67,13 @@ const FavoritesScreen = ({ navigation }) => {
               return url;
             })
             .catch((error) => {
-              console.log(error);
+              // console.log(error);
             });
 
           return {
             ...doc.data(),
             postIdTemp: doc.id,
-            profile_picture: photoUri,
+            profile_picture: photoUri ? photoUri : def_avatar,
           };
         })
       );
@@ -128,7 +125,8 @@ const FavoritesScreen = ({ navigation }) => {
                 post={item}
                 navigation={navigation}
                 favoriteData={favorites}
-                updateData={setFavorites}
+                // updateData={setFavorites}
+                setFavorites={setFavorites}
               />
             );
           }}

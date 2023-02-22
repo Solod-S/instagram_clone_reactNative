@@ -4,18 +4,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import AnimatedLoader from "react-native-animated-loader";
 
+import { authSlice } from "../redux/auth/authReducer";
+import { fsbase } from "../firebase/firebase";
+import { getDoc, doc } from "firebase/firestore";
+
 import { SignedInStack, SignedOutStack } from "./AuthStack";
 import { authStateChangeUsers } from "../redux/auth/authOperation";
 
 const MainRouter = () => {
-  const { stateChange } = useSelector((state) => state.auth);
+  const { stateChange, email } = useSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-    dispatch(authStateChangeUsers());
+    const updateUserData = async () => {
+      const { updateUserInfo } = authSlice.actions;
+      const dbRef = doc(fsbase, `users/${email}`);
+      const userDetails = await getDoc(dbRef);
+      const currentData = userDetails.data();
+      if (currentData) {
+        const { user_about, subscribe_list, favorite } = currentData;
+        dispatch(updateUserInfo({ user_about, subscribe_list, favorite }));
+      }
+    };
+    try {
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000);
+      dispatch(authStateChangeUsers());
+      if (stateChange) {
+        updateUserData();
+      }
+    } catch (error) {
+      console.log(`MainRoute.error`, error);
+    }
   }, [stateChange]);
 
   if (loading) {

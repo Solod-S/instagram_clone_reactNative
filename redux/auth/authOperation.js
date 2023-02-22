@@ -13,9 +13,9 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../../firebase/firebase";
 import { fsbase } from "../../firebase/firebase";
 import { collection, addDoc, doc, setDoc } from "firebase/firestore";
-
 import { authSlice } from "./authReducer";
-const { updateUserProfile, authStateChange, authSignOut } = authSlice.actions;
+const { updateUserProfile, authStateChange, authSignOut, updateUserInfo } =
+  authSlice.actions;
 
 const getRandomProfilePicture = async () => {
   const response = await fetch(
@@ -43,7 +43,6 @@ export const authSignUpUser =
         .catch((error) => {
           console.log(error);
         });
-      console.log(photoUri);
       // const photo = await uploadPhotoToServer(avatar, email);
       await updateProfile(auth.currentUser, {
         displayName: login,
@@ -58,19 +57,21 @@ export const authSignUpUser =
         login: login,
         email: email,
         profile_picture: photoUri,
+        subscribe_list: [],
         favorite: [],
         subscription: "starter",
-        subscribe_list: [],
+        user_about: "",
       });
 
       dispatch(
-        updateUserProfile({
+        updateUserInfo({
           owner_uid: uid,
-          login,
+          username: login,
           email,
           profile_picture: photoUri,
           subscribe_list: [],
           favorite: [],
+          user_about: "",
         })
       );
     } catch (error) {
@@ -97,13 +98,11 @@ export const authSignInUser =
       const { uid, displayName, photoURL } = auth.currentUser;
 
       dispatch(
-        updateUserProfile({
+        updateUserInfo({
           owner_uid: uid,
-          login: displayName,
+          username: displayName,
           email,
           profile_picture: photoURL,
-          subscribe_list: [],
-          favorite: [],
         })
       );
     } catch (error) {
@@ -111,6 +110,7 @@ export const authSignInUser =
         { text: "ok", onPress: () => console.log("Ok"), style: "cancel" },
         { text: "Sign Up", onPress: () => navigation.push("SignupScreen") },
       ]);
+      console.log(error.message);
     }
   };
 
@@ -140,16 +140,17 @@ export const authSignOutUser = () => async (dispatch, getState) => {
 
 export const authStateChangeUsers = () => async (dispatch) => {
   onAuthStateChanged(auth, (user) => {
+    // console.log(`authStateChangeUsers displayName`, user.displayName);
     try {
       if (user) {
         const userUpdateProfile = {
           email: user.email,
           profile_picture: user.photoURL,
-          login: user.displayName,
+          username: user.displayName,
           owner_uid: user.uid,
         };
 
-        dispatch(updateUserProfile(userUpdateProfile));
+        dispatch(updateUserInfo(userUpdateProfile));
         dispatch(authStateChange({ stateChange: true }));
       }
     } catch (error) {

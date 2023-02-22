@@ -20,6 +20,16 @@ const NewCommentScreen = ({ navigation, route }) => {
     const fetchComments = async (email, postIdTemp) => {
       const storage = getStorage();
 
+      const def_avatar = await getDownloadURL(
+        ref(storage, `avatarsImage/def_avatar.png`)
+      )
+        .then((url) => {
+          return url;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       const q = query(
         collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
       );
@@ -33,12 +43,12 @@ const NewCommentScreen = ({ navigation, route }) => {
               return url;
             })
             .catch((error) => {
-              console.log(error);
+              // console.log(error);
             });
           const result = {
             ...doc.data(),
             commentIdTemp: doc.id,
-            profile_picture: photoUri,
+            profile_picture: photoUri ? photoUri : def_avatar,
           };
           return result;
         })
