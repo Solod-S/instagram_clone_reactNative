@@ -6,16 +6,15 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useEffect, useState, memo, useRef } from "react";
 import { useIsFocused, useFocusEffect } from "@react-navigation/native";
-import { useCallback } from "react";
-import { memo } from "react";
-import { useEffect, useState } from "react";
+
 import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "@rneui/themed";
 
 import { fsbase } from "../../firebase/firebase";
 
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs, getDoc, doc } from "firebase/firestore";
 import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
 import { authSlice } from "../../redux/auth/authReducer";
 const { updateUserInfo } = authSlice.actions;
@@ -24,7 +23,7 @@ import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, favoriteData, setFavorites }) => {
+const Post = ({ post, navigation, favoriteData, setFavorites, route }) => {
   const {
     profile_picture,
     email,
@@ -155,36 +154,36 @@ const PostFooter = ({
   favorites,
   currentUserId,
 }) => {
-  const [activeLikeIcon, setActiveLikeIcon] = useState(
-    postFooterIcons[0].image
-  );
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
+  const prevCount = usePrevious(likes);
+
+  // useEffect(() => {
+  //   if (isFocused) {
+  //     const prev = prevCount ? prevCount : likes;
+  //     console.log(`likes`, likes.length, `prevCount`, prev.length);
+  //     console.log(likes.length === prev.length);
+  //   }
+  // }, [isFocused, likes]);
+
   useEffect(() => {
     if (isFocused) {
-      console.log(activeLikeIcon);
-      !likes.includes(currenUser)
-        ? setActiveLikeIcon(postFooterIcons[0].image)
-        : setActiveLikeIcon(postFooterIcons[0].imageActive);
+      const fetchLikes = async (email, postIdTemp) => {
+        const dbRef = doc(fsbase, `users/${email}/posts/${postIdTemp}/`);
+        const userDetails = await getDoc(dbRef);
+        const currentData = userDetails.data();
+        const lastFetchedLikes = currentData.liked_users;
+        console.log(lastFetchedLikes.length);
+        if (!lastFetchedLikes.length !== likes.length) {
+          setLikes(lastFetchedLikes);
+        }
+      };
+      try {
+        fetchLikes(post.email, post.postIdTemp);
+      } catch (error) {}
     }
-  }, [isFocused, likes]);
+  }, [isFocused]);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     const unsubscribe = showIcon();
-  //     return () => unsubscribe();
-  //   }, [likes])
-  // );
-
-  function showIcon() {
-    console.log(likes);
-    !likes.includes(currenUser)
-      ? setActiveLikeIcon(false)
-      : setActiveLikeIcon(true);
-    // return !likes.includes(currenUser)
-    //   ? postFooterIcons[0].image
-    //   : postFooterIcons[0].imageActive;
-  }
   const openNewCommentScreen = (comments, post) => {
     setLoading(true);
     navigation.push("NewCommentScreen", { comments, post });
@@ -195,7 +194,11 @@ const PostFooter = ({
 
   const { postIdTemp, email, postId } = post;
   const dispatch = useDispatch();
-
+  const check = (likes) => {
+    return !likes.includes(currenUser)
+      ? postFooterIcons[0].image
+      : postFooterIcons[0].imageActive;
+  };
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <View style={styles.postFooterLeftContainer}>
@@ -212,25 +215,12 @@ const PostFooter = ({
         >
           <Icon
             imgStyle={styles.postFooterIcon}
-            // imgUrl={
-            //   !likes.includes(currenUser)
-            //     ? postFooterIcons[0].image
-            //     : postFooterIcons[0].imageActive
-            // }
-            imgUrl={activeLikeIcon}
+            imgUrl={
+              !likes.includes(currenUser)
+                ? postFooterIcons[0].image
+                : postFooterIcons[0].imageActive
+            }
           />
-          {/* {activeLikeIcon && (
-            <Icon
-              imgStyle={styles.postFooterIcon}
-              imgUrl={postFooterIcons[0].imageActive}
-            />
-          )}
-          {!activeLikeIcon && (
-            <Icon
-              imgStyle={styles.postFooterIcon}
-              imgUrl={postFooterIcons[0].image}
-            />
-          )} */}
         </TouchableOpacity>
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
@@ -391,3 +381,12 @@ const styles = StyleSheet.create({
 });
 
 export default memo(Post);
+
+function usePrevious(value) {
+  const ref = useRef();
+
+  useEffect(() => {
+    ref.current = value; //assign the value of ref to the argument
+  }, [value]); //this code will run when the value of 'value' changes
+  return ref.current; //in the end, return the current ref value.
+}
