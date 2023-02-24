@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useEffect, useState, memo, useRef } from "react";
-import { useIsFocused, useFocusEffect } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 
 import { useSelector, useDispatch } from "react-redux";
 import { Divider } from "@rneui/themed";
@@ -23,7 +23,7 @@ import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { postFooterIcons } from "../../data/postFooterIcons";
 
-const Post = ({ post, navigation, favoriteData, setFavorites, route }) => {
+const Post = ({ post, navigation, favoriteData, route }) => {
   const {
     profile_picture,
     email,
@@ -76,7 +76,6 @@ const Post = ({ post, navigation, favoriteData, setFavorites, route }) => {
           comments={comments}
           setLikes={setLikes}
           likes={likes}
-          setFavorites={setFavorites}
           favorites={favoriteData}
           currentUserId={currentUserId}
         />
@@ -150,21 +149,11 @@ const PostFooter = ({
   comments,
   setLikes,
   likes,
-  setFavorites,
   favorites,
   currentUserId,
 }) => {
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
-  const prevCount = usePrevious(likes);
-
-  // useEffect(() => {
-  //   if (isFocused) {
-  //     const prev = prevCount ? prevCount : likes;
-  //     console.log(`likes`, likes.length, `prevCount`, prev.length);
-  //     console.log(likes.length === prev.length);
-  //   }
-  // }, [isFocused, likes]);
 
   useEffect(() => {
     if (isFocused) {
@@ -173,14 +162,15 @@ const PostFooter = ({
         const userDetails = await getDoc(dbRef);
         const currentData = userDetails.data();
         const lastFetchedLikes = currentData.liked_users;
-        console.log(lastFetchedLikes.length);
-        if (!lastFetchedLikes.length !== likes.length) {
+        if (lastFetchedLikes.length !== likes.length) {
           setLikes(lastFetchedLikes);
         }
       };
       try {
         fetchLikes(post.email, post.postIdTemp);
-      } catch (error) {}
+      } catch (error) {
+        console.log(`fetchLikes.error`, error.message);
+      }
     }
   }, [isFocused]);
 
@@ -248,7 +238,6 @@ const PostFooter = ({
               currentUserId
             );
             dispatch(updateUserInfo({ favorite: updatedFavorites }));
-            setFavorites(updatedFavorites);
           }}
         >
           <Icon
@@ -381,12 +370,3 @@ const styles = StyleSheet.create({
 });
 
 export default memo(Post);
-
-function usePrevious(value) {
-  const ref = useRef();
-
-  useEffect(() => {
-    ref.current = value; //assign the value of ref to the argument
-  }, [value]); //this code will run when the value of 'value' changes
-  return ref.current; //in the end, return the current ref value.
-}

@@ -1,4 +1,4 @@
-import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
+import { SafeAreaView, ScrollView } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -28,7 +28,7 @@ const UserScreen = ({ navigation, route }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
-  const [favorites, setFavorites] = useState(favorite ? favorite : []);
+  const [subscribe, setSubscribe] = useState([]);
   const [userData, setUserData] = useState({});
 
   const { status } = useSelector((state) => state.appUpdate);
@@ -37,19 +37,24 @@ const UserScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
 
   useLayoutEffect(() => {
-    const fetchFavorite = async (email) => {
+    const fetchMyData = async (email) => {
+      const dbRef = doc(fsbase, `users/${email}`);
+      const postsDetails = await getDoc(dbRef);
+      const currentData = postsDetails.data();
+
+      setSubscribe(currentData.subscribe_list);
+    };
+    const fetchUserData = async (email) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const postsDetails = await getDoc(dbRef);
       const currentData = postsDetails.data();
       setUserData(currentData);
-      // const favoriteData = currentData.favorite;
-      // const favoriteData = currentData ? await currentData.favorite : [];
-      // setFavorites(favoriteData);
     };
     try {
-      fetchFavorite(email);
+      fetchMyData(email);
+      fetchUserData(userEmail);
     } catch (error) {
-      console.log(`fetchFavorite.error`, error.message);
+      console.log(`fetchData.error`, error.message);
     }
   }, []);
 
@@ -67,7 +72,7 @@ const UserScreen = ({ navigation, route }) => {
         });
 
       const photoUri = await getDownloadURL(
-        ref(storage, `avatarsImage/${email}`)
+        ref(storage, `avatarsImage/${userEmail}`)
       )
         .then((url) => {
           return url;
@@ -111,6 +116,8 @@ const UserScreen = ({ navigation, route }) => {
           userEmail={userEmail}
           postLength={posts.length}
           state={userData}
+          setSubscribe={setSubscribe}
+          subscribe={subscribe}
         />
         {isLoading && <PostsSceleton />}
         {posts.length > 0 &&
@@ -122,8 +129,6 @@ const UserScreen = ({ navigation, route }) => {
                 post={post}
                 navigation={navigation}
                 favoriteData={favorite}
-                setFavorites={setFavorites}
-                // setFavorites={setFavorites}
               />
             ))}
         {!posts.length && <UserEmptyPlaceHolder />}

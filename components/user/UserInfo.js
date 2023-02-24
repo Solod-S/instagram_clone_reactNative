@@ -1,30 +1,50 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { useEffect, useState } from "react";
-
-import { Divider } from "@rneui/themed";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 
 import { fsbase } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import "firebase/compat/firestore";
 
 import { Ionicons } from "@expo/vector-icons";
+import { Divider } from "@rneui/themed";
 
-const UserInfo = ({ postLength, userEmail, state }) => {
-  // const [state, setState] = useState({});
-  // useEffect(() => {
-  //   const fetchFavorite = async (email) => {
-  //     const dbRef = doc(fsbase, `users/${email}`);
-  //     const postsDetails = await getDoc(dbRef);
-  //     const currentData = postsDetails.data();
-  //     console.log(currentData.subscribe_list.includes(userEmail));
-  //     setState(currentData);
-  //     console.log(state, userEmail);
-  //   };
-  //   try {
-  //     fetchFavorite(userEmail);
-  //   } catch (error) {
-  //     console.log(`fetchFavorite.error`, error.message);
-  //   }
-  // }, []);
+import handleSubscribe from "../../firebase/operations/handleSubscribe";
+
+const UserInfo = ({
+  postLength,
+  state,
+  userEmail,
+  subscribe,
+  setSubscribe,
+}) => {
+  const { email } = useSelector((state) => state.auth);
+  const onSubscribe = async () => {
+    const result = await handleSubscribe(email, userEmail);
+    setSubscribe(result);
+  };
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      const handleSubscribe = async (email) => {
+        const dbRef = doc(fsbase, `users/${email}`);
+        const currentData = await getDoc(dbRef);
+        const userDetails = currentData.data();
+        if (userDetails.subscribe_list.length !== subscribe.length) {
+          setSubscribe(userDetails.subscribe_list);
+        }
+      };
+
+      try {
+        handleSubscribe(email, userEmail);
+      } catch (error) {
+        console.log(`handleSubscribe.error`, error.message);
+      }
+    }
+  }, [isFocused]);
 
   return (
     <View style={{ paddingHorizontal: 20 }}>
@@ -70,32 +90,35 @@ const UserInfo = ({ postLength, userEmail, state }) => {
               <Text style={styles.description}>sub...</Text>
             </View>
           </View>
-          {/* !!!! */}
-          {state ?? state.subscribe_list.includes(userEmail) ? (
-            <TouchableOpacity
-              style={{
-                marginLeft: "auto",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-              // onPress={() => seteditorMode(true)}
-            >
-              <Ionicons name="person-add" size={22} color="white" />
-              <Text style={{ color: "white", fontSize: 12 }}> SUBSCRIBE</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={{
-                marginLeft: "auto",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-              // onPress={() => seteditorMode(true)}
-            >
-              <Ionicons name="person-remove" size={22} color="white" />
-              <Text style={{ color: "white", fontSize: 12 }}> UNSUBSCRIBE</Text>
-            </TouchableOpacity>
-          )}
+          {email !== userEmail &&
+            (!subscribe.includes(userEmail) ? (
+              <TouchableOpacity
+                style={{
+                  marginLeft: "auto",
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                }}
+                onPress={onSubscribe}
+              >
+                <Ionicons name="person-add" size={22} color="white" />
+                <Text style={{ color: "white", fontSize: 12 }}> SUBSCRIBE</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={{
+                  marginLeft: "auto",
+                  flexDirection: "row",
+                  alignItems: "flex-end",
+                }}
+                onPress={onSubscribe}
+              >
+                <Ionicons name="person-remove" size={22} color="white" />
+                <Text style={{ color: "white", fontSize: 12 }}>
+                  {" "}
+                  UNSUBSCRIBE
+                </Text>
+              </TouchableOpacity>
+            ))}
         </View>
         <Divider width={0.2} orientation="vertical" />
       </View>
