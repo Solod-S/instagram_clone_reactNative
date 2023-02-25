@@ -1,4 +1,4 @@
-import { SafeAreaView, FlatList, View, Image, Text } from "react-native";
+import { SafeAreaView, FlatList, View } from "react-native";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -15,8 +15,11 @@ import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 
 const HomeScreen = ({ navigation }) => {
-  const { favorite, subscribe_list } = useSelector((state) => state.auth);
+  const { email, favorite, subscribe_list, user_about, profile_picture } =
+    useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
+  const authUser = useSelector((state) => state.auth);
+
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState(favorite ? favorite : []);
@@ -56,10 +59,7 @@ const HomeScreen = ({ navigation }) => {
         })
       );
       setIsLoading(false);
-      const subscribeFilteredPost = posts.filter((post) =>
-        subscribe_list.includes(post.email)
-      );
-      setPosts(subscribeFilteredPost.sort((a, b) => a.created < b.created));
+      setPosts(posts.sort((a, b) => a.created < b.created));
     };
 
     try {
@@ -70,7 +70,7 @@ const HomeScreen = ({ navigation }) => {
     } finally {
       dispatch(stopUpdatingApp());
     }
-  }, [status === true, subscribe_list]);
+  }, [status === true]);
 
   useEffect(() => {
     setFavorites(favorite);
@@ -118,25 +118,6 @@ const HomeScreen = ({ navigation }) => {
           // }}
           renderItem={_renderitem}
         />
-      )}
-      {posts.length <= 0 && !isLoading && (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../assets/icons/subscribe-empty.png")}
-              style={{ width: 200, height: 200, marginBottom: 10 }}
-            />
-            <Text style={{ color: "white" }}>
-              You don't have any subscriptions...
-            </Text>
-          </View>
-        </>
       )}
     </SafeAreaView>
   );

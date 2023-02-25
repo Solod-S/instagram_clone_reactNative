@@ -1,13 +1,7 @@
 import { fsbase } from "../firebase";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  increment,
-  getFirestore,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const handleSubscribe = async (email, currenUser) => {
   const dbRef = doc(fsbase, `users/${email}`);
@@ -22,6 +16,7 @@ const handleSubscribe = async (email, currenUser) => {
     });
 
     const result = [...currentData.subscribe_list, currenUser];
+
     return result;
   } else {
     await updateDoc(dbRef, {
@@ -31,6 +26,7 @@ const handleSubscribe = async (email, currenUser) => {
     const result = currentData.subscribe_list.filter(
       (user) => user !== currenUser
     );
+
     return result;
   }
 };

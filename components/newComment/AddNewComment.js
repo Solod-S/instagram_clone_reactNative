@@ -47,7 +47,7 @@ const AddNewComment = ({ navigation, comments, post, setComments }) => {
     <TouchableWithoutFeedback onPress={keyboardHide}>
       <View style={styles.container}>
         <Header navigation={navigation} />
-        <CommentsList post={post} comments={comments} />
+        <CommentsList post={post} comments={comments} navigation={navigation} />
         <FormikCommentUploader
           navigation={navigation}
           userIdTemp={email}
@@ -83,7 +83,7 @@ const Header = ({ navigation }) => {
   );
 };
 
-const About = ({ post }) => {
+const About = ({ post, navigation }) => {
   const {
     caption,
     user,
@@ -93,7 +93,9 @@ const About = ({ post }) => {
     postIdTemp,
     userIdTemp,
     profile_picture,
+    email,
   } = post;
+
   return (
     <View
       style={{
@@ -102,7 +104,10 @@ const About = ({ post }) => {
         paddingVertical: 5,
       }}
     >
-      <TouchableOpacity style={styles.commentLink}>
+      <TouchableOpacity
+        style={styles.commentLink}
+        onPress={() => navigation.push("UserScreen", { userEmail: email })}
+      >
         <Image source={{ uri: profile_picture }} style={styles.commentImg} />
       </TouchableOpacity>
       <View style={{ flex: 1 }}>
@@ -120,7 +125,7 @@ const About = ({ post }) => {
   );
 };
 
-const CommentsList = ({ post, comments }) => {
+const CommentsList = ({ post, comments, navigation }) => {
   const scrollRef = useRef(null);
 
   return (
@@ -138,7 +143,7 @@ const CommentsList = ({ post, comments }) => {
           paddingTop: 10,
         }}
       >
-        <About post={post} />
+        <About post={post} navigation={navigation} />
         <Divider width={1} orientation="vertical" />
         {comments.length > 0 &&
           comments.map(
@@ -152,6 +157,7 @@ const CommentsList = ({ post, comments }) => {
               user,
               date,
               time,
+              email,
             }) => (
               <Comment
                 key={commentId}
@@ -163,6 +169,8 @@ const CommentsList = ({ post, comments }) => {
                 user={user}
                 date={date}
                 time={time}
+                navigation={navigation}
+                email={email}
               />
             )
           )}
@@ -181,6 +189,8 @@ const Comment = ({
   user,
   date,
   time,
+  navigation,
+  email,
 }) => {
   return (
     <View
@@ -190,7 +200,10 @@ const Comment = ({
         paddingVertical: 15,
       }}
     >
-      <TouchableOpacity style={styles.commentLink}>
+      <TouchableOpacity
+        style={styles.commentLink}
+        onPress={() => navigation.push("UserScreen", { userEmail: email })}
+      >
         <Image source={{ uri: profile_picture }} style={styles.commentImg} />
       </TouchableOpacity>
       <View style={{ flex: 1, paddingHorizontal: 5 }}>

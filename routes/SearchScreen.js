@@ -12,7 +12,8 @@ const ScreenStackNavigator = createStackNavigator();
 const SearchScreenStack = ({ navigation, route }) => {
   useEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route);
-    const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen", "UserScreen"];
+    // const tabHiddenRoutes = ["NewPostScreen", "NewCommentScreen", "UserScreen"];
+    const tabHiddenRoutes = ["NewCommentScreen", "NewPostScreen"];
     if (tabHiddenRoutes.includes(routeName)) {
       navigation.setOptions({ tabBarStyle: { display: "none" } });
     } else {

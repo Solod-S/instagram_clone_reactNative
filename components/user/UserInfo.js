@@ -1,6 +1,6 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
 import { fsbase } from "../../firebase/firebase";
@@ -10,6 +10,7 @@ import "firebase/compat/firestore";
 import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 
+import { authSlice } from "../../redux/auth/authReducer";
 import handleSubscribe from "../../firebase/operations/handleSubscribe";
 
 const UserInfo = ({
@@ -19,10 +20,13 @@ const UserInfo = ({
   subscribe,
   setSubscribe,
 }) => {
+  const { updateUserInfo } = authSlice.actions;
+  const dispatch = useDispatch();
   const { email } = useSelector((state) => state.auth);
   const onSubscribe = async () => {
     const result = await handleSubscribe(email, userEmail);
     setSubscribe(result);
+    dispatch(updateUserInfo({ subscribe_list: result }));
   };
 
   const isFocused = useIsFocused();

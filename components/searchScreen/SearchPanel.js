@@ -11,8 +11,8 @@ const SearchPanel = ({ handleFormSubmit, isLoading }) => {
         height: 40,
         flexDirection: "row",
         alignItems: "center",
-
-        marginTop: 15,
+        marginTop: 10,
+        marginBottom: 10,
       }}
     >
       <TextInput
