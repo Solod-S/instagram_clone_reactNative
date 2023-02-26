@@ -26,8 +26,14 @@ import UserInfo from "../../components/profile/UserInfo";
 import UserInfoEditor from "../../components/profile/UserInfoEditor";
 
 const ProfileScreen = ({ navigation }) => {
-  const { email, username, profile_picture, favorite, user_about } =
-    useSelector((state) => state.auth);
+  const {
+    email,
+    username,
+    profile_picture,
+    favorite,
+    user_about,
+    subscribe_list,
+  } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
 
   const [editorMode, seteditorMode] = useState(false);
@@ -117,10 +123,13 @@ const ProfileScreen = ({ navigation }) => {
         <UserInfo
           seteditorMode={seteditorMode}
           username={username}
+          email={email}
           postLength={posts.length}
           profile_picture={profile_picture}
           favorites={favorites}
           user_about={user_about}
+          subscribe_list={subscribe_list}
+          navigation={navigation}
         />
       ) : (
         <UserInfoEditor
@@ -131,6 +140,8 @@ const ProfileScreen = ({ navigation }) => {
           profile_picture={profile_picture}
           favorites={favorites}
           user_about={user_about}
+          subscribe_list={subscribe_list}
+          navigation={navigation}
         />
       )}
       {isLoading && (

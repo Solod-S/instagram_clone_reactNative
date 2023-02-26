@@ -16,7 +16,7 @@ const Stories = () => {
         {USERS.length > 0 &&
           USERS.map(({ id, name, image }) => (
             <TouchableOpacity key={id} style={styles.storyContainer}>
-              <Image source={image} style={styles.storyImg}></Image>
+              <Image source={image} style={styles.storyImg} />
               <Text style={styles.storyName}>
                 {name.length > 11
                   ? name.slice(0, 10).toLowerCase() + "..."

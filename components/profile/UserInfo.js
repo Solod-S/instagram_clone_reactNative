@@ -1,15 +1,30 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
+import { useState } from "react";
 
 const UserInfo = ({
   seteditorMode,
   username,
+  email,
   postLength,
   profile_picture,
   favorites,
   user_about,
+  subscribe_list,
+  navigation,
 }) => {
+  const [loading, setloading] = useState(false);
+
+  const goToSubscription = () => {
+    setloading(true);
+
+    navigation.push("SubscriptionScreen", { userEmail: email });
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
+  };
+
   return (
     <View style={{ paddingHorizontal: 20 }}>
       <View
@@ -51,18 +66,24 @@ const UserInfo = ({
               justifyContent: "space-between",
             }}
           >
-            <View style={styles.infoContainer}>
-              <Text style={styles.number}>{postLength}</Text>
-              <Text style={styles.description}>pos...</Text>
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.number}>{favorites.length}</Text>
-              <Text style={styles.description}>fav...</Text>
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.number}>0</Text>
-              <Text style={styles.description}>sub...</Text>
-            </View>
+            <TouchableOpacity disabled={loading}>
+              <View style={styles.infoContainer}>
+                <Text style={styles.number}>{postLength}</Text>
+                <Text style={styles.description}>pos...</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity disabled={loading}>
+              <View style={styles.infoContainer}>
+                <Text style={styles.number}>{favorites.length}</Text>
+                <Text style={styles.description}>fav...</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity disabled={loading} onPress={goToSubscription}>
+              <View style={styles.infoContainer}>
+                <Text style={styles.number}>{subscribe_list.length}</Text>
+                <Text style={styles.description}>sub...</Text>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
         <Divider width={0.2} orientation="vertical" />
