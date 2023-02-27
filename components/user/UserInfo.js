@@ -1,5 +1,5 @@
 import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
@@ -19,15 +19,12 @@ const UserInfo = ({
   userEmail,
   subscribe,
   setSubscribe,
+  navigation,
 }) => {
   const { updateUserInfo } = authSlice.actions;
   const dispatch = useDispatch();
   const { email } = useSelector((state) => state.auth);
-  const onSubscribe = async () => {
-    const result = await handleSubscribe(email, userEmail);
-    setSubscribe(result);
-    dispatch(updateUserInfo({ subscribe_list: result }));
-  };
+  const [loading, setloading] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -50,6 +47,20 @@ const UserInfo = ({
     }
   }, [isFocused]);
 
+  const goToSubscription = () => {
+    setloading(true);
+
+    navigation.push("SubscriptionScreen", { userEmail: userEmail });
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
+  };
+
+  const onSubscribe = async () => {
+    const result = await handleSubscribe(email, userEmail);
+    setSubscribe(result);
+    dispatch(updateUserInfo({ subscribe_list: result }));
+  };
   return (
     <View style={{ paddingHorizontal: 20 }}>
       <View
@@ -89,9 +100,18 @@ const UserInfo = ({
               )}
               <Text style={styles.description}>fav...</Text>
             </View>
+
             <View style={styles.infoContainer}>
-              <Text style={styles.number}>0</Text>
-              <Text style={styles.description}>sub...</Text>
+              <TouchableOpacity
+                style={{ justifyContent: "center", alignItems: "center" }}
+                disabled={loading}
+                onPress={goToSubscription}
+              >
+                <Text style={styles.number}>
+                  {state.subscribe_list ? state.subscribe_list.length : 0}
+                </Text>
+                <Text style={styles.description}>sub...</Text>
+              </TouchableOpacity>
             </View>
           </View>
           {email !== userEmail &&
@@ -150,8 +170,16 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 20,
   },
-  infoContainer: { justifyContent: "center", alignItems: "center" },
-  number: { color: "white", fontWeight: "600", fontSize: 18 },
+  infoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  number: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 18,
+    justifyContent: "center",
+  },
   description: { color: "white" },
 });
 export default UserInfo;

@@ -118,6 +118,7 @@ const UserScreen = ({ navigation, route }) => {
           state={userData}
           setSubscribe={setSubscribe}
           subscribe={subscribe}
+          navigation={navigation}
         />
         {isLoading && <PostsSceleton />}
         {posts.length > 0 &&

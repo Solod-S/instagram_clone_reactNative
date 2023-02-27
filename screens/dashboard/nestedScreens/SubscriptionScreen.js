@@ -1,6 +1,6 @@
 import { SafeAreaView, ScrollView } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { fsbase } from "../../../firebase/firebase";
 
@@ -25,18 +25,17 @@ import UserEmptyPlaceHolder from "../../../components/user/UserEmptyPlaceHolder"
 import SubscriptionUser from "../../../components/Subscription/SubscriptionUser";
 
 const SubscriptionScreen = ({ navigation, route }) => {
+  const { userEmail } = route.params;
+
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = useState([]);
 
-  const { email, profile_picture, subscribe_list, favorite } = useSelector(
+  const { email, subscribe_list, favorite } = useSelector(
     (state) => state.auth
   );
-  const dispatch = useDispatch();
-
   useEffect(() => {
     const fetchUsers = async () => {
-      if (subscribe_list.length > 0) {
-        const storage = getStorage();
+      if (userEmail === email && subscribe_list.length > 0) {
         const q = query(
           collection(fsbase, "users"),
           where("email", "in", subscribe_list)
@@ -74,7 +73,6 @@ const SubscriptionScreen = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         style={{ paddingTop: 10 }}
       >
-        {/* {isLoading && <PostsSceleton />} */}
         {users.length > 0 &&
           users.map((user) => (
             <SubscriptionUser
@@ -83,6 +81,7 @@ const SubscriptionScreen = ({ navigation, route }) => {
               navigation={navigation}
               setUsers={setUsers}
               email={email}
+              userEmail={userEmail}
             />
           ))}
       </ScrollView>
