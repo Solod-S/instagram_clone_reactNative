@@ -1,8 +1,8 @@
 import { StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { Divider } from "@rneui/themed";
 
+import { Divider } from "@rneui/themed";
 import { bottomTabIcons } from "../../data/bottomTabsIcons";
 
 const BottomTabs = ({ navigation, pageName }) => {

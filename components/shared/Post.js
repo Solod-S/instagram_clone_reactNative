@@ -8,19 +8,16 @@ import {
 } from "react-native";
 import { useEffect, useState, memo, useRef } from "react";
 import { useIsFocused } from "@react-navigation/native";
-
 import { useSelector, useDispatch } from "react-redux";
-import { Divider } from "@rneui/themed";
 
 import { fsbase } from "../../firebase/firebase";
-
 import { collection, query, getDocs, getDoc, doc } from "firebase/firestore";
-import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
+
 import { authSlice } from "../../redux/auth/authReducer";
 const { updateUserInfo } = authSlice.actions;
-
 import { handleLike, handleFavorite } from "../../firebase/operations";
 
+import { Divider } from "@rneui/themed";
 import { postFooterIcons } from "../../data/postFooterIcons";
 
 const Post = ({ post, navigation, favoriteData, route }) => {

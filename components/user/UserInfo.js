@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
+import "firebase/compat/firestore";
 import { fsbase } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import "firebase/compat/firestore";
 
 import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 
-import { authSlice } from "../../redux/auth/authReducer";
 import handleSubscribe from "../../firebase/operations/handleSubscribe";
+import { authSlice } from "../../redux/auth/authReducer";
 
 const UserInfo = ({
   postLength,
@@ -50,7 +50,10 @@ const UserInfo = ({
   const goToSubscription = () => {
     setloading(true);
 
-    navigation.push("SubscriptionScreen", { userEmail: userEmail });
+    navigation.push("SubscriptionScreen", {
+      userData: state,
+      userEmail,
+    });
     setTimeout(() => {
       setloading(false);
     }, 2000);

@@ -95,11 +95,7 @@ const HomeScreen = ({ navigation }) => {
       <Header navigation={navigation} />
       <Stories />
 
-      {isLoading && (
-        <View style={{ Flex: 1 }}>
-          <PostsSceleton />
-        </View>
-      )}
+      {isLoading && <PostsSceleton />}
       {posts.length > 0 && (
         <FlatList
           data={posts}

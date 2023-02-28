@@ -2,6 +2,7 @@ import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
 import { useEffect, useState, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { fsbase } from "../../firebase/firebase";
 import {
   collectionGroup,
@@ -12,8 +13,6 @@ import {
   where,
 } from "firebase/firestore";
 
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-
 import { authSlice } from "../../redux/auth/authReducer";
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
@@ -21,7 +20,6 @@ import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
-
 import UserInfo from "../../components/profile/UserInfo";
 import UserInfoEditor from "../../components/profile/UserInfoEditor";
 
@@ -49,10 +47,6 @@ const ProfileScreen = ({ navigation }) => {
       const dbRef = doc(fsbase, `users/${email}`);
       const userDetails = await getDoc(dbRef);
       const currentData = userDetails.data();
-
-      // const { user_about, subscribe_list, favorite } = currentData;
-
-      // dispatch(updateUserInfo({ user_about, subscribe_list, favorite }));
     };
 
     try {

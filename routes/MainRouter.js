@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
 import AnimatedLoader from "react-native-animated-loader";
 
-import { authSlice } from "../redux/auth/authReducer";
 import { fsbase } from "../firebase/firebase";
 import { getDoc, doc } from "firebase/firestore";
 
-import { SignedInStack, SignedOutStack } from "./AuthStack";
+import { authSlice } from "../redux/auth/authReducer";
 import { authStateChangeUsers } from "../redux/auth/authOperation";
+import { SignedInStack, SignedOutStack } from "./AuthStack";
 
 const MainRouter = () => {
   const { stateChange, email } = useSelector((state) => state.auth);

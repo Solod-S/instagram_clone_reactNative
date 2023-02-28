@@ -1,6 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
+
 import HomeScreen from "../screens/dashboard/HomeScreen";
 import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScreen";
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";

@@ -162,12 +162,8 @@ const HomeScreen = ({ navigation }) => {
     >
       <Header navigation={navigation} />
       <SearchPanel handleFormSubmit={handleFormSubmit} isLoading={isLoading} />
-      {isLoading && (
-        <View style={{ Flex: 1 }}>
-          <PostsSceleton />
-        </View>
-      )}
-      {posts.length > 0 && (
+      {isLoading && <PostsSceleton />}
+      {!isLoading && posts.length > 0 && (
         <FlatList
           data={posts}
           initialNumToRender={4}

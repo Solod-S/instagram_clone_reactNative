@@ -1,12 +1,12 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { authSignOutUser } from "../../redux/auth/authOperation";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 
-import { useState, useEffect } from "react";
+import { authSignOutUser } from "../../redux/auth/authOperation";
 
 const Header = ({ navigation }) => {
   const [loading, setloading] = useState(false);
-  const { status } = useSelector((state) => state.appUpdate);
+
   const dispatch = useDispatch();
 
   const logOut = () => {

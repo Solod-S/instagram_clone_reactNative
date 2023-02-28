@@ -9,7 +9,6 @@ import { SafeAreaView } from "react-native";
 import { useState, useEffect } from "react";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
-
 import LoginForm from "../../components/loginScreen/LoginForm";
 
 const LoginScreen = ({ navigation }) => {

@@ -1,16 +1,30 @@
 import { View, Image, TouchableOpacity, Text } from "react-native";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
+
 import { Ionicons } from "@expo/vector-icons";
 
 import { authSlice } from "../../redux/auth/authReducer";
 import handleSubscribe from "../../firebase/operations/handleSubscribe";
 
 const SubscriptionUser = ({ user, setUsers, email, navigation, userEmail }) => {
+  const [loading, setloading] = useState(false);
   const { updateUserInfo } = authSlice.actions;
   const dispatch = useDispatch();
   const onSubscribe = async () => {
     const result = await handleSubscribe(email, user.email);
     dispatch(updateUserInfo({ subscribe_list: result }));
+  };
+
+  const goToUser = () => {
+    setloading(true);
+
+    navigation.push("UserScreen", {
+      userEmail: user.email,
+    });
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
   };
 
   return (
@@ -23,19 +37,25 @@ const SubscriptionUser = ({ user, setUsers, email, navigation, userEmail }) => {
         paddingBottom: 10,
       }}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Image
-          source={{ uri: user.profile_picture }}
-          style={{
-            width: 35,
-            height: 35,
-            marginRight: 5,
-            borderRadius: 50,
-            borderWidth: 2,
-            borderColor: "#ff8501",
-          }}
-        />
-        <Text style={{ color: "white", fontSize: 16 }}>{user.login}</Text>
+      <View>
+        <TouchableOpacity
+          disabled={loading}
+          onPress={goToUser}
+          style={{ flexDirection: "row", alignItems: "center" }}
+        >
+          <Image
+            source={{ uri: user.profile_picture }}
+            style={{
+              width: 35,
+              height: 35,
+              marginRight: 5,
+              borderRadius: 50,
+              borderWidth: 2,
+              borderColor: "#ff8501",
+            }}
+          />
+          <Text style={{ color: "white", fontSize: 16 }}>{user.login}</Text>
+        </TouchableOpacity>
       </View>
       <View>
         {email === userEmail && (
