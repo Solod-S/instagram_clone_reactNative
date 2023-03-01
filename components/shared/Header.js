@@ -24,6 +24,13 @@ const Header = ({ navigation }) => {
       setloading(false);
     }, 2000);
   };
+  const goToNotification = () => {
+    setloading(true);
+    navigation.push("NotificationScreen");
+    setTimeout(() => {
+      setloading(false);
+    }, 2000);
+  };
 
   return (
     <View style={styles.container}>
@@ -40,7 +47,8 @@ const Header = ({ navigation }) => {
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+
+        <TouchableOpacity onPress={goToNotification}>
           <Image
             source={require("../../assets/heart-icon.png")}
             style={styles.icon}

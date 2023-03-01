@@ -35,25 +35,27 @@ const Post = ({ post, navigation, favoriteData, route }) => {
   const currenUser = useSelector((state) => state.auth.owner_uid);
   const currentUserId = useSelector((state) => state.auth.email);
   const [comments, setComments] = useState([]);
-
+  const isFocused = useIsFocused();
   useEffect(() => {
     const fetchComments = async (email, postIdTemp) => {
       const q = query(
         collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
       );
       const snapshot = await getDocs(q);
-      const comments = snapshot.docs.map((doc) => ({
+      const newComments = snapshot.docs.map((doc) => ({
         ...doc.data(),
         commentIdTemp: doc.id,
       }));
-      setComments(comments);
+      if (newComments.length !== comments.length) {
+        setComments(newComments);
+      }
     };
     try {
       fetchComments(email, postIdTemp);
     } catch (error) {
       console.log(`fetchComments.error`, error.message);
     }
-  }, [post, favoriteData]);
+  }, [post, favoriteData, isFocused]);
 
   return (
     <View style={styles.postContainer}>
@@ -304,7 +306,7 @@ const Comments = ({ comments }) => {
             >
               <Text style={{ color: "white" }}>
                 <Text style={{ fontWeight: "600" }}>{user}:</Text>
-                <Text style={{ color: "whitesmoke" }}> {comment}</Text>
+                <Text style={{ color: "whitesmoke" }}> {comment} </Text>
               </Text>
             </View>
           );

@@ -65,7 +65,7 @@ const FormikCommentUploader = ({
         email,
       }
     );
-    dispatch(startUpdatingApp());
+
     setComments((prevState) => [
       ...prevState,
       {

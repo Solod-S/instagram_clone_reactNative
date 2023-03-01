@@ -7,6 +7,7 @@ import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScree
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";
 import UserScreen from "../screens/dashboard/UserScreen";
 import SubscriptionScreen from "../screens/dashboard/nestedScreens/SubscriptionScreen";
+import NotificationScreen from "../screens/dashboard/nestedScreens/NotificationScreen";
 
 const ScreenStackNavigator = createStackNavigator();
 
@@ -49,6 +50,11 @@ const SearchScreenStack = ({ navigation, route }) => {
         options={{ headerShown: false }}
         name="SubscriptionScreen"
         component={SubscriptionScreen}
+      />
+      <ScreenStackNavigator.Screen
+        options={{ headerShown: false }}
+        name="NotificationScreen"
+        component={NotificationScreen}
       />
     </ScreenStackNavigator.Navigator>
   );

@@ -196,7 +196,8 @@ const HomeScreen = ({ navigation }) => {
               style={{ width: 200, height: 200, marginBottom: 10 }}
             />
             <Text style={{ color: "white" }}>
-              Sorry, we couldn't find posts that contain "{searchQuery}"
+              Sorry, we couldn't find posts and users that contain "
+              {searchQuery}"
             </Text>
           </View>
         </>
