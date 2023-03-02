@@ -1,4 +1,5 @@
 import { fsbase } from "../firebase";
+
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import {
@@ -9,7 +10,9 @@ import {
   getFirestore,
 } from "firebase/firestore";
 
-const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
+import handleNotification from "./handleNotification";
+
+const handleLike = async (currenUser, postIdTemp, userIdTemp, email) => {
   const dbRef = doc(fsbase, `users/${userIdTemp}/posts/${postIdTemp}`);
   const postsDetails = await getDoc(dbRef);
   const currentData = postsDetails.data();
@@ -21,6 +24,16 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
       liked_users: firebase.firestore.FieldValue.arrayUnion(currenUser),
     });
 
+    handleNotification(
+      userIdTemp,
+      {
+        userEmail: email,
+        postId: postIdTemp,
+        description: "liked your post",
+      },
+      "likeAction"
+    );
+
     const result = [...currentData.liked_users, currenUser];
     return result;
   } else {
@@ -28,6 +41,17 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp) => {
       // likes: increment(-1),
       liked_users: firebase.firestore.FieldValue.arrayRemove(currenUser),
     });
+
+    handleNotification(
+      userIdTemp,
+      {
+        userEmail: email,
+        postId: postIdTemp,
+        description: "unliked your post",
+      },
+      "likeAction"
+    );
+
     const result = currentData.liked_users.filter(
       (user) => user !== currenUser
     );

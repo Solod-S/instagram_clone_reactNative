@@ -197,7 +197,8 @@ const PostFooter = ({
             const updatedLikes = await handleLike(
               currenUser,
               postIdTemp,
-              email
+              email,
+              currentUserId
             );
             setLikes(updatedLikes);
           }}

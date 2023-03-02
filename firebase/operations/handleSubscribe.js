@@ -3,6 +3,8 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 
+import handleNotification from "./handleNotification";
+
 const handleSubscribe = async (email, currenUser) => {
   const dbRef = doc(fsbase, `users/${email}`);
   const userDetails = await getDoc(dbRef);
@@ -16,7 +18,15 @@ const handleSubscribe = async (email, currenUser) => {
     });
 
     const result = [...currentData.subscribe_list, currenUser];
-
+    handleNotification(
+      currenUser,
+      {
+        userEmail: email,
+        postId: null,
+        description: "subscribed",
+      },
+      "subscribeAction"
+    );
     return result;
   } else {
     await updateDoc(dbRef, {
@@ -26,7 +36,15 @@ const handleSubscribe = async (email, currenUser) => {
     const result = currentData.subscribe_list.filter(
       (user) => user !== currenUser
     );
-
+    handleNotification(
+      currenUser,
+      {
+        userEmail: email,
+        postId: null,
+        description: "unsubscribed",
+      },
+      "subscribeAction"
+    );
     return result;
   }
 };

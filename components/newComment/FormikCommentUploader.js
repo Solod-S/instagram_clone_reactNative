@@ -15,6 +15,8 @@ import { fsbase } from "../../firebase/firebase";
 import "firebase/compat/firestore";
 import { addDoc, collection } from "firebase/firestore";
 
+import handleNotification from "../../firebase/operations/handleNotification";
+
 const uploadCommentSchema = yup.object().shape({
   message: yup
     .string()
@@ -64,6 +66,14 @@ const FormikCommentUploader = ({
         user: username,
         email,
       }
+    );
+    handleNotification(
+      userId,
+      {
+        userEmail: email,
+        postId: postId,
+      },
+      "commentAction"
     );
 
     setComments((prevState) => [
