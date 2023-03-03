@@ -7,6 +7,8 @@ import "firebase/compat/firestore";
 import { collection, query, getDocs } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
+import getAvatar from "../../../firebase/operations/getAvatar";
+
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import AddNewComment from "../../../components/newComment/AddNewComment";
 
@@ -20,15 +22,7 @@ const NewCommentScreen = ({ navigation, route }) => {
     const fetchComments = async (email, postIdTemp) => {
       const storage = getStorage();
 
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
 
       const q = query(
         collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
@@ -36,15 +30,8 @@ const NewCommentScreen = ({ navigation, route }) => {
       const snapshot = await getDocs(q);
       const newComments = await Promise.all(
         snapshot.docs.map(async (doc) => {
-          const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${email}`)
-          )
-            .then((url) => {
-              return url;
-            })
-            .catch((error) => {
-              // console.log(error);
-            });
+          const photoUri = await getAvatar("user", email);
+
           const result = {
             ...doc.data(),
             commentIdTemp: doc.id,

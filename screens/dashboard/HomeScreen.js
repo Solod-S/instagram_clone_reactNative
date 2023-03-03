@@ -7,6 +7,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { collectionGroup, query, getDocs } from "firebase/firestore";
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
@@ -25,29 +26,14 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const storage = getStorage();
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
+
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
       const posts = await Promise.all(
         snapshot.docs.map(async (doc) => {
-          const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${doc.data().email}`)
-          )
-            .then((url) => {
-              return url;
-            })
-            .catch((error) => {
-              // console.log(error);
-            });
+          const email = doc.data().email;
+          const photoUri = await getAvatar("user", email);
           return {
             ...doc.data(),
             postIdTemp: doc.id,

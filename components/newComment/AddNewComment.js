@@ -44,7 +44,10 @@ const AddNewComment = ({ navigation, comments, post, setComments }) => {
   }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={keyboardHide}>
+    <TouchableWithoutFeedback
+      disabled={!isKeyboardVisible}
+      onPress={keyboardHide}
+    >
       <View style={styles.container}>
         <Header navigation={navigation} />
         <CommentsList post={post} comments={comments} navigation={navigation} />

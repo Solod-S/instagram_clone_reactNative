@@ -17,6 +17,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { getAuth, updateProfile } from "firebase/auth";
 
 import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
@@ -68,14 +69,8 @@ const UserInfoEditor = ({
     const file = await response.blob();
 
     const uploadPhoto = await uploadBytes(storageRef, file).then(() => {});
+    const photoUri = await getAvatar("user", email);
 
-    const photoUri = await getDownloadURL(ref(storage, `avatarsImage/${email}`))
-      .then((url) => {
-        return url;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
     await updateProfilePhoto(photoUri);
     return photoUri;
   };

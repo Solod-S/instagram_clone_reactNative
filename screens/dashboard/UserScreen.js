@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/user/Header";
@@ -59,26 +60,9 @@ const UserScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const storage = getStorage();
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
+      const photoUri = await getAvatar("user", userEmail);
 
-      const photoUri = await getDownloadURL(
-        ref(storage, `avatarsImage/${userEmail}`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          // console.log(error);
-        });
       const q = query(
         collectionGroup(fsbase, "posts"),
         where("email", "==", userEmail)
@@ -110,7 +94,7 @@ const UserScreen = ({ navigation, route }) => {
       }}
     >
       <Header navigation={navigation} />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
         <UserInfo
           userEmail={userEmail}
           postLength={posts.length}

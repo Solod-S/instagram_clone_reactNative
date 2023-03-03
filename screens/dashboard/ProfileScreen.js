@@ -15,6 +15,7 @@ import {
 
 import { authSlice } from "../../redux/auth/authReducer";
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/profile/Header";
@@ -62,26 +63,9 @@ const ProfileScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const storage = getStorage();
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
+      const photoUri = await getAvatar("user", email);
 
-      const photoUri = await getDownloadURL(
-        ref(storage, `avatarsImage/${email}`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          // console.log(error);
-        });
       const q = query(
         collectionGroup(fsbase, "posts"),
         where("email", "==", email)

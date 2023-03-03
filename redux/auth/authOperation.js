@@ -16,6 +16,7 @@ import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import { authSlice } from "./authReducer";
 const { updateUserProfile, authStateChange, authSignOut, updateUserInfo } =
   authSlice.actions;
+import getAvatar from "../../firebase/operations/getAvatar";
 
 const getRandomProfilePicture = async () => {
   const response = await fetch(
@@ -34,15 +35,7 @@ export const authSignUpUser =
       // const randomPhoto = await getRandomProfilePicture();
 
       const storage = getStorage();
-      const photoUri = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const photoUri = await getAvatar("default");
       // const photo = await uploadPhotoToServer(avatar, email);
       await updateProfile(auth.currentUser, {
         displayName: login,

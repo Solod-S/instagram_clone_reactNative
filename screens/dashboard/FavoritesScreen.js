@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
@@ -44,31 +45,15 @@ const FavoritesScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchFavoritePost = async (id) => {
-      const storage = getStorage();
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
       const postsCollection = collectionGroup(fsbase, "posts");
       const q = query(postsCollection, where("postId", "==", id));
 
       const snapshot = await getDocs(q);
       const posts = await Promise.all(
         snapshot.docs.map(async (doc) => {
-          const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${email}`)
-          )
-            .then((url) => {
-              return url;
-            })
-            .catch((error) => {
-              // console.log(error);
-            });
+          const userData = doc.data();
+          const photoUri = await getAvatar("user", userData.email);
 
           return {
             ...doc.data(),

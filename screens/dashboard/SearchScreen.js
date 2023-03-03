@@ -14,6 +14,7 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { collectionGroup, query, getDocs } from "firebase/firestore";
 
 import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
@@ -21,7 +22,7 @@ import Post from "../../components/shared/Post";
 import PostsSceleton from "../../components/shared/Sceleton";
 import SearchPanel from "../../components/searchScreen/SearchPanel";
 
-const HomeScreen = ({ navigation }) => {
+const SearchScreen = ({ navigation }) => {
   const { favorite, email } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,7 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const storage = getStorage();
+      const def_avatar = await getAvatar("default");
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
       const posts = snapshot.docs.map((doc) => ({
@@ -51,19 +52,11 @@ const HomeScreen = ({ navigation }) => {
 
       const result = await Promise.all(
         filteredPost.map(async (item) => {
-          const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${email}`)
-          )
-            .then((url) => {
-              return url;
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          const photoUri = await getAvatar("user", item.email);
 
           return {
             ...item,
-            profile_picture: photoUri,
+            profile_picture: photoUri ? photoUri : def_avatar,
           };
         })
       );
@@ -84,29 +77,13 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const storage = getStorage();
-      const def_avatar = await getDownloadURL(
-        ref(storage, `avatarsImage/def_avatar.png`)
-      )
-        .then((url) => {
-          return url;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      const def_avatar = await getAvatar("default");
       const q = query(collectionGroup(fsbase, "posts"));
       const snapshot = await getDocs(q);
       const posts = await Promise.all(
         snapshot.docs.map(async (doc) => {
-          const photoUri = await getDownloadURL(
-            ref(storage, `avatarsImage/${doc.data().email}`)
-          )
-            .then((url) => {
-              return url;
-            })
-            .catch((error) => {
-              // console.log(error);
-            });
+          const userData = doc.data();
+          const photoUri = await getAvatar("user", userData.email);
           return {
             ...doc.data(),
             postIdTemp: doc.id,
@@ -206,4 +183,4 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
-export default HomeScreen;
+export default SearchScreen;
