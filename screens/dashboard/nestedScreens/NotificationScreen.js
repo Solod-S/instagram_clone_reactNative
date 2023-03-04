@@ -18,6 +18,8 @@ import getAvatar from "../../../firebase/operations/getAvatar";
 import getUserInfo from "../../../firebase/operations/getUserInfo";
 import getPostInfo from "../../../firebase/operations/getPostInfo";
 
+import { NotificationSceleton } from "../../../components/shared/Sceleton";
+import Header from "../../../components/NotificationScreen/Header";
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import Journal from "../../../components/NotificationScreen/Journal";
 
@@ -38,17 +40,17 @@ const NotificationScreen = ({ navigation }) => {
           const postId = doc.data().postId;
           const photoUri = await getAvatar("user", userEmail);
           const userData = await getUserInfo(userEmail);
-          let postImage = null;
+          let postData = null;
 
           if (postId) {
             const post = await getPostInfo(email, postId);
-            postImage = post.postImage;
+            postData = { ...post, postIdTemp: postId };
           }
           return {
             ...doc.data(),
             profile_picture: photoUri ? photoUri : def_avatar,
             login: userData.login,
-            postImage,
+            post: postData,
           };
         })
       );
@@ -68,7 +70,11 @@ const NotificationScreen = ({ navigation }) => {
         backgroundColor: "black",
       }}
     >
-      <Journal navigation={navigation} notification={notification} />
+      <Header navigation={navigation} />
+      {isLoading && <NotificationSceleton />}
+      {notification.length > 0 && (
+        <Journal navigation={navigation} notification={notification} />
+      )}
     </SafeAreaView>
   );
 };

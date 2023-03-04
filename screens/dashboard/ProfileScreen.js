@@ -20,7 +20,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/profile/Header";
 import Post from "../../components/shared/Post";
-import PostsSceleton from "../../components/shared/Sceleton";
+import { PostsSceleton } from "../../components/shared/Sceleton";
 import UserInfo from "../../components/profile/UserInfo";
 import UserInfoEditor from "../../components/profile/UserInfoEditor";
 

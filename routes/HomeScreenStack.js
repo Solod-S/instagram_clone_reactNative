@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
+import PostScreen from "../screens/dashboard/nestedScreens/PostScreen";
 import HomeScreen from "../screens/dashboard/HomeScreen";
 import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScreen";
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";
@@ -56,6 +57,11 @@ const HomeScreenStack = ({ navigation, route }) => {
         options={{ headerShown: false }}
         name="NotificationScreen"
         component={NotificationScreen}
+      />
+      <HomeScreenStackNavigator.Screen
+        options={{ headerShown: false }}
+        name="PostScreen"
+        component={PostScreen}
       />
     </HomeScreenStackNavigator.Navigator>
   );

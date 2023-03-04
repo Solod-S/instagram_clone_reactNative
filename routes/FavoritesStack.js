@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
+import PostScreen from "../screens/dashboard/nestedScreens/PostScreen";
 import FavoritesScreen from "../screens/dashboard/FavoritesScreen";
 import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScreen";
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";
@@ -61,6 +62,11 @@ const FavoritesStack = ({ navigation, route }) => {
         options={{ headerShown: false }}
         name="NotificationScreen"
         component={NotificationScreen}
+      />
+      <FavoritesStackNavigator.Screen
+        options={{ headerShown: false }}
+        name="PostScreen"
+        component={PostScreen}
       />
     </FavoritesStackNavigator.Navigator>
   );

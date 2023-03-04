@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
+import PostScreen from "../screens/dashboard/nestedScreens/PostScreen";
 import ProfileScreen from "../screens/dashboard/ProfileScreen";
 import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScreen";
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";
@@ -55,6 +56,11 @@ const ProfileScreenStack = ({ navigation, route }) => {
         options={{ headerShown: false }}
         name="NotificationScreen"
         component={NotificationScreen}
+      />
+      <ProfileScreenStackNavigator.Screen
+        options={{ headerShown: false }}
+        name="PostScreen"
+        component={PostScreen}
       />
     </ProfileScreenStackNavigator.Navigator>
   );

@@ -13,7 +13,7 @@ import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Stories from "../../components/home/Stories";
 import Post from "../../components/shared/Post";
-import PostsSceleton from "../../components/shared/Sceleton";
+import { PostsSceleton } from "../../components/shared/Sceleton";
 
 const HomeScreen = ({ navigation }) => {
   const { favorite, subscribe_list } = useSelector((state) => state.auth);

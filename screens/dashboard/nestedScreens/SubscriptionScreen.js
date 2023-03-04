@@ -7,7 +7,7 @@ import { collection, query, getDocs, where } from "firebase/firestore";
 
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import Header from "../../../components/Subscription/Header";
-import PostsSceleton from "../../../components/shared/Sceleton";
+import { PostsSceleton } from "../../../components/shared/Sceleton";
 import UserEmptyPlaceHolder from "../../../components/user/UserEmptyPlaceHolder";
 import SubscriptionUser from "../../../components/Subscription/SubscriptionUser";
 

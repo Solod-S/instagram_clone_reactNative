@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { useEffect } from "react";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
+import PostScreen from "../screens/dashboard/nestedScreens/PostScreen";
 import SearchScreen from "../screens/dashboard/SearchScreen";
 import NewCommentScreen from "../screens/dashboard/nestedScreens/NewCommentScreen";
 import NewPostScreen from "../screens/dashboard/nestedScreens/NewPostScreen";
@@ -55,6 +56,11 @@ const SearchScreenStack = ({ navigation, route }) => {
         options={{ headerShown: false }}
         name="NotificationScreen"
         component={NotificationScreen}
+      />
+      <ScreenStackNavigator.Screen
+        options={{ headerShown: false }}
+        name="PostScreen"
+        component={PostScreen}
       />
     </ScreenStackNavigator.Navigator>
   );

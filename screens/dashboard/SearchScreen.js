@@ -19,7 +19,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import PostsSceleton from "../../components/shared/Sceleton";
+import { PostsSceleton } from "../../components/shared/Sceleton";
 import SearchPanel from "../../components/searchScreen/SearchPanel";
 
 const SearchScreen = ({ navigation }) => {

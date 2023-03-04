@@ -26,7 +26,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import PostsSceleton from "../../components/shared/Sceleton";
+import { PostsSceleton } from "../../components/shared/Sceleton";
 
 const FavoritesScreen = ({ navigation }) => {
   const { email, favorite, subscribe_list, user_about, profile_picture } =

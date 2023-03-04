@@ -19,7 +19,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/user/Header";
 import Post from "../../components/shared/Post";
-import PostsSceleton from "../../components/shared/Sceleton";
+import { PostsSceleton } from "../../components/shared/Sceleton";
 import UserEmptyPlaceHolder from "../../components/user/UserEmptyPlaceHolder";
 import UserInfo from "../../components/user/UserInfo";
 
