@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react";
 import { fsbase } from "../../../firebase/firebase";
 import "firebase/compat/firestore";
 import { collection, query, getDocs } from "firebase/firestore";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 import getAvatar from "../../../firebase/operations/getAvatar";
 
@@ -15,13 +14,12 @@ import AddNewComment from "../../../components/newComment/AddNewComment";
 const NewCommentScreen = ({ navigation, route }) => {
   const prevCommentsRef = useRef();
   const [comments, setComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { post } = route.params;
 
   useEffect(() => {
     prevCommentsRef.current = comments;
     const fetchComments = async (email, postIdTemp) => {
-      const storage = getStorage();
-
       const def_avatar = await getAvatar("default");
 
       const q = query(
@@ -30,7 +28,8 @@ const NewCommentScreen = ({ navigation, route }) => {
       const snapshot = await getDocs(q);
       const newComments = await Promise.all(
         snapshot.docs.map(async (doc) => {
-          const photoUri = await getAvatar("user", email);
+          const userEmail = doc.data().email;
+          const photoUri = await getAvatar("user", userEmail);
 
           const result = {
             ...doc.data(),
@@ -45,8 +44,10 @@ const NewCommentScreen = ({ navigation, route }) => {
       if (prevCommentsRef.current.length !== sortedComments.length) {
         setComments(sortedComments);
       }
+      setIsLoading(false);
     };
     try {
+      setIsLoading(true);
       fetchComments(post.email, post.postIdTemp);
     } catch (error) {
       console.log(`fetchComments.error`, error.message);
@@ -65,6 +66,7 @@ const NewCommentScreen = ({ navigation, route }) => {
         comments={comments}
         post={post}
         setComments={setComments}
+        isLoading={isLoading}
       />
     </SafeAreaView>
   );

@@ -12,8 +12,15 @@ import { useRef, useEffect, useState } from "react";
 import { Divider } from "@rneui/themed";
 
 import FormikCommentUploader from "./FormikCommentUploader";
+import { CommentSceleton } from "../shared/Sceleton";
 
-const AddNewComment = ({ navigation, comments, post, setComments }) => {
+const AddNewComment = ({
+  navigation,
+  comments,
+  post,
+  setComments,
+  isLoading,
+}) => {
   const { email, postIdTemp } = post;
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -50,7 +57,14 @@ const AddNewComment = ({ navigation, comments, post, setComments }) => {
     >
       <View style={styles.container}>
         <Header navigation={navigation} />
-        <CommentsList post={post} comments={comments} navigation={navigation} />
+        {!isLoading && comments.length > 0 && (
+          <CommentsList
+            post={post}
+            comments={comments}
+            navigation={navigation}
+          />
+        )}
+        {isLoading && <CommentSceleton />}
         <FormikCommentUploader
           navigation={navigation}
           userIdTemp={email}

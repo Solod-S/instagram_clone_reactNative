@@ -18,7 +18,7 @@ import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
-import Header from "../../components/profile/Header";
+import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
 import { PostsSceleton } from "../../components/shared/Sceleton";
 import UserInfo from "../../components/profile/UserInfo";
