@@ -14,9 +14,7 @@ import {
   collection,
 } from "firebase/firestore";
 
-import getAvatar from "../../../firebase/operations/getAvatar";
-import getUserInfo from "../../../firebase/operations/getUserInfo";
-import getPostInfo from "../../../firebase/operations/getPostInfo";
+import fetchNotification from "../../../firebase/operations/fetchNotification";
 
 import { NotificationSceleton } from "../../../components/shared/Sceleton";
 import Header from "../../../components/NotificationScreen/Header";
@@ -29,39 +27,17 @@ const NotificationScreen = ({ navigation }) => {
   const { email } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const fetchNotification = async () => {
-      const def_avatar = await getAvatar("default");
-      const q = query(collection(fsbase, `users/${email}/journal/`));
-
-      const notificationSnapshot = await getDocs(q);
-      const notification = await Promise.all(
-        notificationSnapshot.docs.map(async (doc) => {
-          const userEmail = await doc.data().userEmail;
-          const postId = doc.data().postId;
-          const photoUri = await getAvatar("user", userEmail);
-          const userData = await getUserInfo(userEmail);
-          let postData = null;
-
-          if (postId) {
-            const post = await getPostInfo(email, postId);
-            postData = { ...post, postIdTemp: postId };
-          }
-          return {
-            ...doc.data(),
-            profile_picture: photoUri ? photoUri : def_avatar,
-            login: userData.login,
-            post: postData,
-          };
-        })
-      );
-
+    const fetchData = async () => {
+      const notification = await fetchNotification(email);
       setNotification(notification.sort((a, b) => a.created < b.created));
       setIsLoading(false);
     };
     try {
       setIsLoading(true);
-      fetchNotification();
-    } catch (error) {}
+      fetchData();
+    } catch (error) {
+      console.log(`NotificationScreen.error`, error.message);
+    }
   }, []);
   return (
     <SafeAreaView

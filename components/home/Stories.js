@@ -9,13 +9,17 @@ import {
 
 import USERS from "../../data/users";
 
-const Stories = () => {
+const Stories = ({ navigation, data, index }) => {
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {USERS.length > 0 &&
           USERS.map(({ id, name, image }) => (
-            <TouchableOpacity key={id} style={styles.storyContainer}>
+            <TouchableOpacity
+              key={id}
+              style={styles.storyContainer}
+              onPress={() => navigation.push("StoriesScreen", { data, index })}
+            >
               <Image source={image} style={styles.storyImg} />
               <Text style={styles.storyName}>
                 {name.length > 11

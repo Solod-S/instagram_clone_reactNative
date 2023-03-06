@@ -1,13 +1,30 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
-import { useDispatch } from "react-redux";
-import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect } from "react";
+import { useIsFocused } from "@react-navigation/native";
 
 import { authSignOutUser } from "../../redux/auth/authOperation";
+import fetchNewNotification from "../../firebase/operations/fetchNewNotifications";
 
 const Header = ({ navigation }) => {
+  const { email } = useSelector((state) => state.auth);
   const [loading, setloading] = useState(false);
-
+  const [notification, setNotification] = useState(0);
+  const isFocused = useIsFocused();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const newNotification = await fetchNewNotification(email);
+
+      setNotification(newNotification.length);
+    };
+    try {
+      fetchData();
+    } catch (error) {
+      console.log(`NotificationScreen.error`, error.message);
+    }
+  }, [isFocused]);
 
   const logOut = () => {
     setloading(true);
@@ -49,12 +66,17 @@ const Header = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={goToNotification}>
+          {notification > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadBadgeText}>{notification}</Text>
+            </View>
+          )}
           <Image
             source={require("../../assets/heart-icon.png")}
             style={styles.icon}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <View style={styles.unreadBadge}>
             <Text style={styles.unreadBadgeText}>11</Text>
           </View>
@@ -62,7 +84,7 @@ const Header = ({ navigation }) => {
             source={require("../../assets//msg-icon.png")}
             style={styles.icon}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -93,9 +115,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#ff3250",
     position: "absolute",
     left: 13,
-    bottom: 18,
+    bottom: 14,
     width: 25,
-    height: 18,
+    height: 25,
     borderRadius: 25,
     alignItems: "center",
     justifyContent: "center",
