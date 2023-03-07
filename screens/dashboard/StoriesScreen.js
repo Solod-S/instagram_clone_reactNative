@@ -24,64 +24,8 @@ function StoriesScreen({ navigation, route }) {
   const { data, index } = route.params;
 
   // THE CONTENT
+  const [currentIndx, setCurrentIndx] = useState(index);
   const [content, setContent] = useState(data[index].data);
-  // const [content, setContent] = useState([
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/1.jpg?alt=media&token=63304587-513b-436d-a228-a6dc0680a16a",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/2.mp4?alt=media&token=fcd41460-a441-4841-98da-d8f9a714dd4d",
-  //     type: "video",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/3.jpg?alt=media&token=326c1809-adc2-4a23-b9c3-8995df7fcccd",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/4.jpg?alt=media&token=e9c5bead-4d9f-40d9-b9fa-c6bc12dd6134",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/5.jpg?alt=media&token=7dcb6c3a-8080-4448-bb2c-c9594e70e572",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/6.jpg?alt=media&token=1121dc71-927d-4517-9a53-23ede1e1b386",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/7.jpg?alt=media&token=7e92782a-cd84-43b6-aba6-6fe6269eded6",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/8.mp4?alt=media&token=5b6af212-045b-4195-9d65-d1cab613bd7f",
-  //     type: "video",
-  //     finish: 0,
-  //   },
-  //   {
-  //     content:
-  //       "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/9.jpg?alt=media&token=0a382e94-6f3f-4d4e-932f-e3c3f085ebc3",
-  //     type: "image",
-  //     finish: 0,
-  //   },
-  // ]);
-
   // for get the duration
   const [end, setEnd] = useState(0);
   // current is for get the current content is now playing
@@ -91,10 +35,14 @@ function StoriesScreen({ navigation, route }) {
   // progress is the animation value of the bars content playing the current state
   const progress = useRef(new Animated.Value(0)).current;
 
+  useEffect(() => {
+    setContent(data[currentIndx].data);
+  }, [currentIndx]);
+
   // start() is for starting the animation bars at the top
   function start(n) {
     // checking if the content type is video or not
-    if (content[current].type == "video") {
+    if (current && content[current].type == "video") {
       // type video
       if (load) {
         Animated.timing(progress, {
@@ -137,9 +85,19 @@ function StoriesScreen({ navigation, route }) {
       progress.setValue(0);
       setLoad(false);
     } else {
+      if (data.length > currentIndx + 1) {
+        let data = [...content];
+        data[current].finish = 1;
+        setContent(data);
+        progress.setValue(0);
+
+        setCurrent(0);
+        setCurrentIndx((prevState) => (prevState += 1));
+        return;
+      }
+
       // the next content is empty
       close();
-      navigation.goBack();
     }
   }
 
@@ -155,6 +113,18 @@ function StoriesScreen({ navigation, route }) {
       setLoad(false);
     } else {
       // the previous content is empty
+
+      if (currentIndx - 1 >= 0) {
+        let data = [...content];
+        data[current].finish = 0;
+        setContent(data);
+        progress.setValue(0);
+        setCurrent(0);
+        setCurrentIndx((prevState) => (prevState -= 1));
+        return;
+      }
+
+      // the next content is empty
       close();
     }
   }
@@ -164,7 +134,7 @@ function StoriesScreen({ navigation, route }) {
     progress.setValue(0);
     setLoad(false);
     navigation.goBack();
-    console.log("close icon pressed");
+    // console.log("close icon pressed");
   }
 
   return (
@@ -184,7 +154,7 @@ function StoriesScreen({ navigation, route }) {
             positionMillis={0}
             onReadyForDisplay={play()}
             onPlaybackStatusUpdate={(AVPlaybackStatus) => {
-              console.log(AVPlaybackStatus);
+              // console.log(AVPlaybackStatus);
               setLoad(AVPlaybackStatus.isLoaded);
               setEnd(AVPlaybackStatus.durationMillis);
             }}
@@ -268,7 +238,7 @@ function StoriesScreen({ navigation, route }) {
             <Image
               style={{ height: 30, width: 30, borderRadius: 25 }}
               source={{
-                uri: "https://firebasestorage.googleapis.com/v0/b/instagram-clone-f3106.appspot.com/o/ylKTg2Mg_400x400.jpg?alt=media&token=fb4661aa-3a62-4af7-9051-86e5485ea36f",
+                uri: data[currentIndx].avatar,
               }}
             />
             <Text
@@ -278,7 +248,7 @@ function StoriesScreen({ navigation, route }) {
                 paddingLeft: 10,
               }}
             >
-              kikidding
+              {data[currentIndx].login}
             </Text>
           </View>
           {/* END OF THE AVATAR AND USERNAME */}

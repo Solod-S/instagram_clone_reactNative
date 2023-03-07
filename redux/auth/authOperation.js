@@ -50,7 +50,7 @@ export const authSignUpUser =
         login: login,
         email: email,
         profile_picture: photoUri,
-        subscribe_list: [],
+        subscribe_list: [email],
         favorite: [],
         subscription: "starter",
         user_about: "",
@@ -62,7 +62,7 @@ export const authSignUpUser =
           username: login,
           email,
           profile_picture: photoUri,
-          subscribe_list: [],
+          subscribe_list: [email],
           favorite: [],
           user_about: "",
         })

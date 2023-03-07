@@ -29,7 +29,7 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp, email) => {
       {
         userEmail: email,
         postId: postIdTemp,
-        description: "liked your post",
+        description: "liked a post",
       },
       "likeAction"
     );
@@ -47,7 +47,7 @@ const handleLike = async (currenUser, postIdTemp, userIdTemp, email) => {
       {
         userEmail: email,
         postId: postIdTemp,
-        description: "unliked your post",
+        description: "unliked a post",
       },
       "likeAction"
     );

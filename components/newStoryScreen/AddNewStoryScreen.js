@@ -1,13 +1,14 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
-import FormikPostUploader from "./FormikPostUploader";
+import FormikStoryUploader from "./FormikStoryUploader";
 
-const AddNewPost = ({ navigation }) => {
+const AddNewStoryScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} loading={loading} />
-      <FormikPostUploader
+      <FormikStoryUploader
         navigation={navigation}
         setLoading={setLoading}
         loading={loading}
@@ -24,7 +25,7 @@ const Header = ({ navigation, loading }) => (
         style={{ width: 30, height: 30 }}
       />
     </TouchableOpacity>
-    <Text style={styles.headerText}>NEW POST</Text>
+    <Text style={styles.headerText}>NEW STORY</Text>
     <Text></Text>
   </View>
 );
@@ -48,4 +49,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddNewPost;
+export default AddNewStoryScreen;

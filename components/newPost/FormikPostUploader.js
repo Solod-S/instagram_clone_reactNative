@@ -33,7 +33,7 @@ const uploadPostSchema = yup.object().shape({
     .required(),
 });
 
-const FormikPostUploader = ({ navigation }) => {
+const FormikPostUploader = ({ navigation, setLoading, loading }) => {
   const dispatch = useDispatch();
   const { owner_uid, username, email, profile_picture } = useSelector(
     (state) => state.auth
@@ -43,7 +43,6 @@ const FormikPostUploader = ({ navigation }) => {
     Dimensions.get("window").width - 10 * 2
   );
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [postImage, setPostImage] = useState("");
 
   useEffect(() => {
