@@ -1,11 +1,21 @@
-import { SafeAreaView, FlatList, View, Image, Text } from "react-native";
+import {
+  SafeAreaView,
+  FlatList,
+  View,
+  Image,
+  Text,
+  RefreshControl,
+} from "react-native";
 import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import { fsbase } from "../../firebase/firebase";
 import { collectionGroup, query, getDocs } from "firebase/firestore";
 
-import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
+import {
+  stopUpdatingApp,
+  startUpdatingApp,
+} from "../../redux/auth/appUpdateSlice";
 import getAvatar from "../../firebase/operations/getAvatar";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
@@ -17,6 +27,7 @@ import { PostsSkeleton } from "../../components/shared/Skeleton";
 const HomeScreen = ({ navigation }) => {
   const { favorite, subscribe_list } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
+  const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState(favorite ? favorite : []);
@@ -70,6 +81,15 @@ const HomeScreen = ({ navigation }) => {
       setFavorites={setFavorites}
     />
   );
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(startUpdatingApp());
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
   return (
     <SafeAreaView
       style={{
@@ -83,6 +103,9 @@ const HomeScreen = ({ navigation }) => {
       {isLoading && <PostsSkeleton />}
       {posts.length > 0 && !isLoading && (
         <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={posts}
           initialNumToRender={4}
           showsVerticalScrollIndicator={false}
