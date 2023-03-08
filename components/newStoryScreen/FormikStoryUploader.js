@@ -59,7 +59,6 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
       });
 
       if (!result.canceled) {
-        console.log(result.assets[0]);
         setPostImage(result.assets[0].uri);
         setFileType(result.assets[0].type);
       }

@@ -7,7 +7,7 @@ import { collection, query, getDocs, where } from "firebase/firestore";
 
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import Header from "../../../components/Subscription/Header";
-import { SubscriptionSceleton } from "../../../components/shared/Sceleton";
+import { SubscriptionSkeleton } from "../../../components/shared/Skeleton";
 import SubscriptionUser from "../../../components/Subscription/SubscriptionUser";
 
 const SubscriptionScreen = ({ navigation, route }) => {
@@ -89,7 +89,7 @@ const SubscriptionScreen = ({ navigation, route }) => {
       }}
     >
       <Header navigation={navigation} />
-      {isLoading && <SubscriptionSceleton />}
+      {isLoading && <SubscriptionSkeleton />}
       {users.length > 0 && !isLoading && (
         <ScrollView
           showsVerticalScrollIndicator={false}

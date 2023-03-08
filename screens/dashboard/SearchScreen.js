@@ -19,7 +19,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import { PostsSceleton } from "../../components/shared/Sceleton";
+import { PostsSkeleton } from "../../components/shared/Skeleton";
 import SearchPanel from "../../components/searchScreen/SearchPanel";
 
 const SearchScreen = ({ navigation }) => {
@@ -139,7 +139,7 @@ const SearchScreen = ({ navigation }) => {
     >
       <Header navigation={navigation} />
       <SearchPanel handleFormSubmit={handleFormSubmit} isLoading={isLoading} />
-      {isLoading && <PostsSceleton />}
+      {isLoading && <PostsSkeleton />}
       {!isLoading && posts.length > 0 && (
         <FlatList
           data={posts}

@@ -6,11 +6,15 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useIsFocused } from "@react-navigation/native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 
+import fetchStories from "../../firebase/operations/fetchStories";
+import { StoriesSkeleton } from "../shared/Skeleton";
 import USERS from "../../data/users";
 
 const storiesData = [
@@ -84,9 +88,30 @@ const storiesData = [
   },
 ];
 
-const Stories = ({ navigation, data, index }) => {
-  const { profile_picture } = useSelector((state) => state.auth);
+const Stories = ({ navigation }) => {
+  const { profile_picture, email, subscribe_list } = useSelector(
+    (state) => state.auth
+  );
+  const isFocused = useIsFocused();
   const [loading, setloading] = useState(false);
+  const [stories, setStories] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async (subscribe_list) => {
+      if (subscribe_list.length <= 0) {
+        setloading(false);
+        return;
+      }
+      const stories = await fetchStories(subscribe_list);
+      setStories(stories);
+      setloading(false);
+    };
+
+    try {
+      setloading(true);
+      fetchData(subscribe_list);
+    } catch (error) {}
+  }, [subscribe_list, isFocused]);
 
   const openNewStoriesScreen = () => {
     setloading(true);
@@ -96,9 +121,9 @@ const Stories = ({ navigation, data, index }) => {
     }, 2000);
   };
 
-  const openStoriesScreen = () => {
+  const openStoriesScreen = (index) => {
     setloading(true);
-    navigation.push("StoriesScreen", { data: storiesData, index: 1 });
+    navigation.push("StoriesScreen", { data: stories, index });
     setTimeout(() => {
       setloading(false);
     }, 2000);
@@ -131,19 +156,21 @@ const Stories = ({ navigation, data, index }) => {
           </View>
           <Text style={styles.storyName}>Your story</Text>
         </TouchableOpacity>
-        {USERS.length > 0 &&
-          USERS.map(({ id, name, image }) => (
+        {loading && <StoriesSkeleton />}
+        {stories.length > 0 &&
+          !loading &&
+          stories.map(({ email, login, avatar }, index) => (
             <TouchableOpacity
-              key={id}
+              key={email}
               style={styles.storyContainer}
               disabled={loading}
-              onPress={openStoriesScreen}
+              onPress={() => openStoriesScreen(index)}
             >
-              <Image source={image} style={styles.storyImg} />
+              <Image source={{ uri: avatar }} style={styles.storyImg} />
               <Text style={styles.storyName}>
-                {name.length > 11
-                  ? name.slice(0, 10).toLowerCase() + "..."
-                  : name.toLowerCase()}
+                {login.length > 11
+                  ? login.slice(0, 10).toLowerCase() + "..."
+                  : login.toLowerCase()}
               </Text>
             </TouchableOpacity>
           ))}

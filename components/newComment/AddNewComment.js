@@ -12,7 +12,7 @@ import { useRef, useEffect, useState } from "react";
 import { Divider } from "@rneui/themed";
 
 import FormikCommentUploader from "./FormikCommentUploader";
-import { CommentSceleton } from "../shared/Sceleton";
+import { CommentSkeleton } from "../shared/Skeleton";
 
 const AddNewComment = ({
   navigation,
@@ -64,7 +64,7 @@ const AddNewComment = ({
             navigation={navigation}
           />
         )}
-        {isLoading && <CommentSceleton />}
+        {isLoading && <CommentSkeleton />}
         <FormikCommentUploader
           navigation={navigation}
           userIdTemp={email}

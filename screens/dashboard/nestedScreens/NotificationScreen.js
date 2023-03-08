@@ -16,7 +16,7 @@ import {
 
 import fetchNotification from "../../../firebase/operations/fetchNotification";
 
-import { NotificationSceleton } from "../../../components/shared/Sceleton";
+import { NotificationSkeleton } from "../../../components/shared/Skeleton";
 import Header from "../../../components/NotificationScreen/Header";
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import Journal from "../../../components/NotificationScreen/Journal";
@@ -47,7 +47,7 @@ const NotificationScreen = ({ navigation }) => {
       }}
     >
       <Header navigation={navigation} />
-      {isLoading && <NotificationSceleton />}
+      {isLoading && <NotificationSkeleton />}
       {notification.length > 0 && (
         <Journal navigation={navigation} notification={notification} />
       )}

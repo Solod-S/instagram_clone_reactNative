@@ -23,6 +23,7 @@ const screenRatio = height / width;
 function StoriesScreen({ navigation, route }) {
   const { data, index } = route.params;
 
+  const [loading, setLoading] = useState(false);
   // THE CONTENT
   const [currentIndx, setCurrentIndx] = useState(index);
   const [content, setContent] = useState(data[index].data);
@@ -131,10 +132,17 @@ function StoriesScreen({ navigation, route }) {
 
   // closing the modal set the animation progress to 0
   function close() {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
     progress.setValue(0);
     setLoad(false);
     navigation.goBack();
     // console.log("close icon pressed");
+    setTimeout(() => {
+      setLoading(false);
+    }, 4000);
   }
 
   return (
@@ -149,7 +157,7 @@ function StoriesScreen({ navigation, route }) {
             }}
             rate={1.0}
             volume={1.0}
-            resizeMode="cover"
+            resizeMode="contain"
             shouldPlay={true}
             positionMillis={0}
             onReadyForDisplay={play()}

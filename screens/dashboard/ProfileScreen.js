@@ -20,7 +20,7 @@ import getAvatar from "../../firebase/operations/getAvatar";
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import { PostsSceleton } from "../../components/shared/Sceleton";
+import { PostsSkeleton } from "../../components/shared/Skeleton";
 import UserInfo from "../../components/profile/UserInfo";
 import UserInfoEditor from "../../components/profile/UserInfoEditor";
 
@@ -124,7 +124,7 @@ const ProfileScreen = ({ navigation }) => {
       )}
       {isLoading && (
         <>
-          <PostsSceleton />
+          <PostsSkeleton />
         </>
       )}
 

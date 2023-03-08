@@ -1,9 +1,9 @@
 import { InstagramLoader } from "react-native-easy-content-loader";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
 import ContentLoader from "react-native-easy-content-loader";
 import { Bullets } from "react-native-easy-content-loader";
 
-const PostsSceleton = () => {
+const PostsSkeleton = () => {
   return (
     <ScrollView>
       <InstagramLoader
@@ -20,7 +20,7 @@ const PostsSceleton = () => {
   );
 };
 
-const NotificationSceleton = () => {
+const NotificationSkeleton = () => {
   return (
     <ScrollView>
       <ContentLoader
@@ -37,7 +37,7 @@ const NotificationSceleton = () => {
   );
 };
 
-const CommentSceleton = () => {
+const CommentSkeleton = () => {
   return (
     <ScrollView>
       <InstagramLoader
@@ -55,7 +55,7 @@ const CommentSceleton = () => {
   );
 };
 
-const SubscriptionSceleton = () => {
+const SubscriptionSkeleton = () => {
   return (
     <ScrollView>
       <Bullets
@@ -72,9 +72,25 @@ const SubscriptionSceleton = () => {
   );
 };
 
+const StoriesSkeleton = () => {
+  return (
+    <Bullets
+      active
+      aSize={70}
+      tHeight={0}
+      // tWidth={100}
+      // listSize={4}
+      primaryColor="#434446"
+      secondaryColor="#303030"
+      // containerStyles={{ padding: 0 }}
+    />
+  );
+};
+
 export {
-  PostsSceleton,
-  NotificationSceleton,
-  CommentSceleton,
-  SubscriptionSceleton,
+  PostsSkeleton,
+  NotificationSkeleton,
+  CommentSkeleton,
+  SubscriptionSkeleton,
+  StoriesSkeleton,
 };

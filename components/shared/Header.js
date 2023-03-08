@@ -8,7 +8,7 @@ import fetchNewNotification from "../../firebase/operations/fetchNewNotification
 
 const Header = ({ navigation }) => {
   const { email } = useSelector((state) => state.auth);
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(0);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
@@ -27,25 +27,25 @@ const Header = ({ navigation }) => {
   }, [isFocused]);
 
   const logOut = () => {
-    setloading(true);
+    setLoading(true);
     dispatch(authSignOutUser());
     setTimeout(() => {
-      setloading(false);
+      setLoading(false);
     }, 2000);
   };
 
   const createPost = () => {
-    setloading(true);
+    setLoading(true);
     navigation.push("NewPostScreen");
     setTimeout(() => {
-      setloading(false);
+      setLoading(false);
     }, 2000);
   };
   const goToNotification = () => {
-    setloading(true);
+    setLoading(true);
     navigation.push("NotificationScreen");
     setTimeout(() => {
-      setloading(false);
+      setLoading(false);
     }, 2000);
   };
 
