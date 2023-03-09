@@ -3,7 +3,7 @@ import { collectionGroup, query, getDocs, where } from "firebase/firestore";
 
 import getUserInfo from "./getUserInfo";
 
-const fetchStories = async (subscribe_list) => {
+const getStories = async (subscribe_list) => {
   const q = query(
     collectionGroup(fsbase, "stories"),
     where("email", "in", subscribe_list)
@@ -36,4 +36,4 @@ const fetchStories = async (subscribe_list) => {
   return allData.filter((item) => item.data.length > 0);
 };
 
-export default fetchStories;
+export default getStories;

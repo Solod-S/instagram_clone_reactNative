@@ -1,21 +1,23 @@
 import { Text, StyleSheet, View, Image, TouchableOpacity } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from "react";
-import { useIsFocused } from "@react-navigation/native";
 
 import { authSignOutUser } from "../../redux/auth/authOperation";
-import fetchNewNotification from "../../firebase/operations/fetchNewNotifications";
+import getNewNotifications from "../../firebase/operations/getNewNotifications";
 
 const Header = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const isFocused = useIsFocused();
+
   const { email } = useSelector((state) => state.auth);
+
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(0);
-  const isFocused = useIsFocused();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchData = async () => {
-      const newNotification = await fetchNewNotification(email);
+      const newNotification = await getNewNotifications(email);
 
       setNotification(newNotification.length);
     };

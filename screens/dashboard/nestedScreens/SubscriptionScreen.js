@@ -1,22 +1,21 @@
-import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
+import { SafeAreaView, ScrollView } from "react-native";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { fsbase } from "../../../firebase/firebase";
-import { collection, query, getDocs, where } from "firebase/firestore";
+import getSubscription from "../../../firebase/operations/getSubscription";
 
+import SubscriptionUser from "../../../components/subscriptionScreen/SubscriptionUser";
+import SubscriptionEmptyPlaceHolder from "../../../components/subscriptionScreen/SubscriptionEmptyPlaceHolder";
+import Header from "../../../components/subscriptionScreen/Header";
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
-import Header from "../../../components/Subscription/Header";
-import { SubscriptionSkeleton } from "../../../components/shared/Skeleton";
-import SubscriptionUser from "../../../components/Subscription/SubscriptionUser";
+import SubscriptionSkeleton from "../../../components/shared/skeletons/SubscriptionSkeleton";
 
 const SubscriptionScreen = ({ navigation, route }) => {
   const { userData, userEmail } = route.params;
+  const { email, subscribe_list } = useSelector((state) => state.auth);
+
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
-  const { email, subscribe_list, favorite } = useSelector(
-    (state) => state.auth
-  );
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -25,15 +24,7 @@ const SubscriptionScreen = ({ navigation, route }) => {
 
       if (canFethMyUserData) {
         setIsLoading(true);
-        const q = query(
-          collection(fsbase, "users"),
-          where("email", "in", subscribe_list)
-          // where("arr", "array-contains-any", "id")
-        );
-        const snapshot = await getDocs(q);
-        const updatedUsers = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }));
+        const updatedUsers = await getSubscription(subscribe_list);
         if (users.length !== updatedUsers.length) {
           setUsers(updatedUsers);
         }
@@ -56,15 +47,7 @@ const SubscriptionScreen = ({ navigation, route }) => {
 
       if (canFethCurrentUserData) {
         setIsLoading(true);
-        const q = query(
-          collection(fsbase, "users"),
-          where("email", "in", userData.subscribe_list)
-          // where("arr", "array-contains-any", "id")
-        );
-        const snapshot = await getDocs(q);
-        const updatedUsers = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-        }));
+        const updatedUsers = await getSubscription(userData.subscribe_list);
         if (users.length !== updatedUsers.length) {
           setUsers(updatedUsers);
         }
@@ -73,7 +56,6 @@ const SubscriptionScreen = ({ navigation, route }) => {
         setUsers([]);
       }
     };
-
     try {
       fetchUsers();
     } catch (error) {
@@ -107,25 +89,7 @@ const SubscriptionScreen = ({ navigation, route }) => {
           ))}
         </ScrollView>
       )}
-      {users.length <= 0 && !isLoading && (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../../assets/icons/subscribe-empty.png")}
-              style={{ width: 200, height: 200, marginBottom: 10 }}
-            />
-            <Text style={{ color: "white" }}>
-              There aren't any subscriptions...
-            </Text>
-          </View>
-        </>
-      )}
+      {users.length <= 0 && !isLoading && <SubscriptionEmptyPlaceHolder />}
     </SafeAreaView>
   );
 };

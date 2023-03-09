@@ -1,15 +1,13 @@
 import { Text, View, Image, TouchableOpacity, Dimensions } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
 import { Formik } from "formik";
 import * as yup from "yup";
-import * as ImagePicker from "expo-image-picker";
-import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
 
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
-import { fsbase } from "../../firebase/firebase";
+import handleStory from "../../firebase/operations/handleStory";
+import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 const PLACEHOLDERIMG =
   "https://www.shorekids.co.nz/wp-content/uploads/2014/08/ig-placeholder-500.jpg";
@@ -22,34 +20,13 @@ const uploadPostSchema = yup.object().shape({
 });
 
 const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
+  const dispatch = useDispatch();
   const { email } = useSelector((state) => state.auth);
 
-  const [postImage, setPostImage] = useState("");
+  const [mediaFile, setMediaFile] = useState("");
   const [fileType, setFileType] = useState("");
 
-  const uploadPhotoToServer = async () => {
-    const storage = getStorage();
-    const uniquePostId = uuidv4();
-    const storageRef = ref(storage, `stories/${uniquePostId}`);
-
-    const response = await fetch(postImage);
-    const file = await response.blob();
-
-    await uploadBytes(storageRef, file).then(() => {});
-
-    const processedPhoto = await getDownloadURL(
-      ref(storage, `stories/${uniquePostId}`)
-    )
-      .then((url) => {
-        return url;
-      })
-      .catch((error) => {
-        console.log(`error.processedPhoto`, error.message);
-      });
-    return processedPhoto;
-  };
-
-  const imageHander = async () => {
+  const imageHandler = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -59,35 +36,21 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
       });
 
       if (!result.canceled) {
-        setPostImage(result.assets[0].uri);
+        setMediaFile(result.assets[0].uri);
         setFileType(result.assets[0].type);
       }
     } catch (error) {
-      console.log("error.imageHander", error.message);
+      console.log("error.imageHandler", error.message);
     }
   };
 
   const uploadStoryToServer = async () => {
+    const makeStory = async (mediaFile, fileType, email) => {
+      await handleStory(mediaFile, fileType, email);
+      dispatch(startUpdatingApp());
+    };
     try {
-      const postPhoto = await uploadPhotoToServer();
-      const uniqueStoryId = uuidv4();
-      const date = new Date().toLocaleDateString();
-      const time = new Date()
-        .toLocaleTimeString()
-        .split(":")
-        .splice(0, 2)
-        .join(":");
-      const created = Date.now().toString();
-      await addDoc(collection(fsbase, `users/${email}/stories/`), {
-        created,
-        date,
-        time,
-        email,
-        storiesId: uniqueStoryId,
-        content: postPhoto,
-        type: fileType,
-        finish: 0,
-      });
+      makeStory(mediaFile, fileType, email);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -109,7 +72,7 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
           }
           setLoading(true);
           await uploadStoryToServer();
-          setPostImage("");
+          setMediaFile("");
           setFileType("");
 
           setLoading(false);
@@ -135,12 +98,12 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
             >
               <TouchableOpacity
                 activeOpacity={0.6}
-                onPress={imageHander}
+                onPress={imageHandler}
                 style={{ borderRadius: 15 }}
               >
                 <Image
                   source={{
-                    uri: postImage ? postImage : PLACEHOLDERIMG,
+                    uri: mediaFile ? mediaFile : PLACEHOLDERIMG,
                   }}
                   style={{
                     height: "90%",
@@ -151,7 +114,7 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
               </TouchableOpacity>
 
               <TouchableOpacity
-                disabled={!isSubmitting && postImage.length === 0}
+                disabled={!isSubmitting && mediaFile.length === 0}
                 style={{
                   alignItems: "center",
                   marginLeft: "auto",
@@ -162,7 +125,7 @@ const FormikStoryUploader = ({ navigation, setLoading, loading }) => {
                 <Text
                   style={{
                     color:
-                      postImage.length !== 0 && !isSubmitting
+                      mediaFile.length !== 0 && !isSubmitting
                         ? "white"
                         : "gray",
                     fontSize: 22,

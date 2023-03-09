@@ -3,15 +3,11 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
-import "firebase/compat/firestore";
-import { fsbase } from "../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import getUserInfo from "../../firebase/operations/getUserInfo";
+import { authSlice } from "../../redux/auth/authReducer";
 
 import { Ionicons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
-
-import handleSubscribe from "../../firebase/operations/handleSubscribe";
-import { authSlice } from "../../redux/auth/authReducer";
 
 const UserInfo = ({
   postLength,
@@ -21,26 +17,25 @@ const UserInfo = ({
   setSubscribe,
   navigation,
 }) => {
-  const { updateUserInfo } = authSlice.actions;
   const dispatch = useDispatch();
-  const { email } = useSelector((state) => state.auth);
-  const [loading, setloading] = useState(false);
-
   const isFocused = useIsFocused();
+
+  const { email } = useSelector((state) => state.auth);
+
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
-      const handleSubscribe = async (email) => {
-        const dbRef = doc(fsbase, `users/${email}`);
-        const currentData = await getDoc(dbRef);
-        const userDetails = currentData.data();
+      const handleSubscribe = async (userEmail) => {
+        const userDetails = await getUserInfo(userEmail);
+
         if (userDetails.subscribe_list.length !== subscribe.length) {
           setSubscribe(userDetails.subscribe_list);
         }
       };
 
       try {
-        handleSubscribe(email, userEmail);
+        handleSubscribe(userEmail);
       } catch (error) {
         console.log(`handleSubscribe.error`, error.message);
       }
@@ -60,6 +55,7 @@ const UserInfo = ({
   };
 
   const onSubscribe = async () => {
+    const { updateUserInfo } = authSlice.actions;
     const result = await handleSubscribe(email, userEmail);
     setSubscribe(result);
     dispatch(updateUserInfo({ subscribe_list: result }));

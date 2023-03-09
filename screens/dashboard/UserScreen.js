@@ -1,53 +1,44 @@
-import { SafeAreaView, ScrollView } from "react-native";
-import { useEffect, useState, useLayoutEffect } from "react";
+import { SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { useEffect, useState, useLayoutEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { fsbase } from "../../firebase/firebase";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import {
-  collectionGroup,
-  query,
-  getDocs,
-  doc,
-  getDoc,
-  where,
-} from "firebase/firestore";
+import getUserInfo from "../../firebase/operations/getUserInfo";
+import getPostsByEmail from "../../firebase/operations/getPostsByEmail";
 
-import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
-import getAvatar from "../../firebase/operations/getAvatar";
+import {
+  stopUpdatingApp,
+  startUpdatingApp,
+} from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
-import Header from "../../components/user/Header";
+import Header from "../../components/userScreen/Header";
 import Post from "../../components/shared/Post";
-import { PostsSkeleton } from "../../components/shared/Skeleton";
-import UserEmptyPlaceHolder from "../../components/user/UserEmptyPlaceHolder";
-import UserInfo from "../../components/user/UserInfo";
+import PostsSkeleton from "../../components/shared/skeletons/PostsSkeleton";
+import UserEmptyPlaceHolder from "../../components/userScreen/UserEmptyPlaceHolder";
+import UserInfo from "../../components/userScreen/UserInfo";
 
 const UserScreen = ({ navigation, route }) => {
+  const dispatch = useDispatch();
+
   const { userEmail } = route.params;
 
+  const { status } = useSelector((state) => state.appUpdate);
+  const { email, favorite } = useSelector((state) => state.auth);
+
+  const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [subscribe, setSubscribe] = useState([]);
   const [userData, setUserData] = useState({});
 
-  const { status } = useSelector((state) => state.appUpdate);
-  const { email, username, profile_picture, subscribe_list, favorite } =
-    useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-
   useLayoutEffect(() => {
     const fetchMyData = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
+      const currentData = await getUserInfo(email);
 
       setSubscribe(currentData.subscribe_list);
     };
-    const fetchUserData = async (email) => {
-      const dbRef = doc(fsbase, `users/${email}`);
-      const postsDetails = await getDoc(dbRef);
-      const currentData = postsDetails.data();
+    const fetchUserData = async (userEmail) => {
+      const currentData = await getUserInfo(userEmail);
       setUserData(currentData);
     };
     try {
@@ -55,24 +46,16 @@ const UserScreen = ({ navigation, route }) => {
       fetchUserData(userEmail);
     } catch (error) {
       console.log(`fetchData.error`, error.message);
+    } finally {
+      if (status === true) {
+        dispatch(stopUpdatingApp());
+      }
     }
-  }, []);
+  }, [status === true]);
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const def_avatar = await getAvatar("default");
-      const photoUri = await getAvatar("user", userEmail);
-
-      const q = query(
-        collectionGroup(fsbase, "posts"),
-        where("email", "==", userEmail)
-      );
-      const snapshot = await getDocs(q);
-      const posts = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        postIdTemp: doc.id,
-        profile_picture: photoUri ? photoUri : def_avatar,
-      }));
+      const posts = await getPostsByEmail(userEmail);
       setIsLoading(false);
       setPosts(posts);
     };
@@ -82,9 +65,19 @@ const UserScreen = ({ navigation, route }) => {
     } catch (error) {
       console.log(`fetchPosts.error`, error.message);
     } finally {
-      dispatch(stopUpdatingApp());
+      if (status === true) {
+        dispatch(stopUpdatingApp());
+      }
     }
   }, [status === true]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(startUpdatingApp());
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView
@@ -94,7 +87,13 @@ const UserScreen = ({ navigation, route }) => {
       }}
     >
       <Header navigation={navigation} />
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        style={{ flex: 1 }}
+      >
         <UserInfo
           userEmail={userEmail}
           postLength={posts.length}
@@ -105,6 +104,7 @@ const UserScreen = ({ navigation, route }) => {
         />
         {isLoading && <PostsSkeleton />}
         {posts.length > 0 &&
+          !isLoading &&
           posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (

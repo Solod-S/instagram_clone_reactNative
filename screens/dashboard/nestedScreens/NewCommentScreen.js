@@ -1,48 +1,26 @@
-import { SafeAreaView } from "react-native";
-import { LogBox } from "react-native";
+import { SafeAreaView, LogBox } from "react-native";
 import { useEffect, useState, useRef } from "react";
 
-import { fsbase } from "../../../firebase/firebase";
-import "firebase/compat/firestore";
-import { collection, query, getDocs } from "firebase/firestore";
-
-import getAvatar from "../../../firebase/operations/getAvatar";
+import getComments from "../../../firebase/operations/getComments";
 
 import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
-import AddNewComment from "../../../components/newComment/AddNewComment";
+import AddNewComment from "../../../components/newCommentScreen/AddNewComment";
 
 const NewCommentScreen = ({ navigation, route }) => {
   const prevCommentsRef = useRef();
+
+  const { post } = route.params;
+
   const [comments, setComments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { post } = route.params;
 
   useEffect(() => {
     prevCommentsRef.current = comments;
+
     const fetchComments = async (email, postIdTemp) => {
-      const def_avatar = await getAvatar("default");
-
-      const q = query(
-        collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
-      );
-      const snapshot = await getDocs(q);
-      const newComments = await Promise.all(
-        snapshot.docs.map(async (doc) => {
-          const userEmail = doc.data().email;
-          const photoUri = await getAvatar("user", userEmail);
-
-          const result = {
-            ...doc.data(),
-            commentIdTemp: doc.id,
-            profile_picture: photoUri ? photoUri : def_avatar,
-          };
-          return result;
-        })
-      );
-      const sortedComments = newComments.sort((a, b) => b.created < a.created);
-
-      if (prevCommentsRef.current.length !== sortedComments.length) {
-        setComments(sortedComments);
+      const comments = await getComments(email, postIdTemp);
+      if (prevCommentsRef.current.length !== comments.length) {
+        setComments(comments);
       }
       setIsLoading(false);
     };

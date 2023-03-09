@@ -1,4 +1,4 @@
-import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Text } from "react-native";
 
 const Header = ({ navigation }) => (
   <View style={styles.headerContainer}>
@@ -16,7 +16,6 @@ const Header = ({ navigation }) => (
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 10,
-
     flex: 1,
   },
   headerContainer: {

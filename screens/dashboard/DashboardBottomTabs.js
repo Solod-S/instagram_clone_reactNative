@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { TouchableOpacity } from "react-native";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
@@ -37,18 +38,20 @@ const DashboardBottomTabs = ({ navigation }) => {
         name="HomeScreen"
         component={HomeScreenStack}
         options={{
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           title: "HomeScreen",
 
           tabBarIcon: ({ focused, size, color }) => (
-            <Octicons
-              name="home"
-              // size={focused ? 30 : 26}
-              size={28}
-              color={focused ? "white" : color}
-            />
+            <TouchableOpacity onPress={() => navigation.navigate("HomeScreen")}>
+              <Octicons
+                name="home"
+                // size={focused ? 30 : 26}
+                size={28}
+                color={focused ? "white" : color}
+              />
+            </TouchableOpacity>
           ),
         }}
       />
@@ -56,16 +59,20 @@ const DashboardBottomTabs = ({ navigation }) => {
       <MainTab.Screen
         name="SearchScreen"
         options={{
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           tabBarIcon: ({ focused, size, color }) => (
-            <Feather
-              name="search"
-              size={28}
-              // size={focused ? 44 : 34}
-              color={focused ? "white" : color}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("SearchScreen")}
+            >
+              <Feather
+                name="search"
+                size={28}
+                // size={focused ? 44 : 34}
+                color={focused ? "white" : color}
+              />
+            </TouchableOpacity>
           ),
         }}
         component={SearchScreenStack}
@@ -73,16 +80,20 @@ const DashboardBottomTabs = ({ navigation }) => {
       <MainTab.Screen
         name="FavoriteScreen"
         options={{
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           tabBarIcon: ({ focused, size, color }) => (
-            <Fontisto
-              name="favorite"
-              // size={focused ? 30 : 26}
-              size={24}
-              color={focused ? "white" : color}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("FavoriteScreen")}
+            >
+              <Fontisto
+                name="favorite"
+                // size={focused ? 30 : 26}
+                size={24}
+                color={focused ? "white" : color}
+              />
+            </TouchableOpacity>
           ),
         }}
         component={FavoritesStack}
@@ -91,18 +102,22 @@ const DashboardBottomTabs = ({ navigation }) => {
         name="ProfileScreen"
         component={ProfileScreenStack}
         options={{
-          unmountOnBlur: true,
+          // unmountOnBlur: true,
           headerShown: false,
           tabBarVisible: false,
           title: "ProfileScreen",
 
           tabBarIcon: ({ focused, size, color }) => (
-            <MaterialIcons
-              name="account-circle"
-              size={32}
-              // size={focused ? 34 : 30}
-              color={focused ? "white" : color}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ProfileScreen")}
+            >
+              <MaterialIcons
+                name="account-circle"
+                size={32}
+                // size={focused ? 34 : 30}
+                color={focused ? "white" : color}
+              />
+            </TouchableOpacity>
           ),
         }}
       />

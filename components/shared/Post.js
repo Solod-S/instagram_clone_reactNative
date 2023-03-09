@@ -6,15 +6,14 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { useEffect, useState, memo, useRef } from "react";
 import { useIsFocused } from "@react-navigation/native";
+import { useEffect, useState, memo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { fsbase } from "../../firebase/firebase";
-import { collection, query, getDocs, getDoc, doc } from "firebase/firestore";
+import getCommentsOnly from "../../firebase/operations/getCommentsOnly";
+import getLikes from "../../firebase/operations/getLikes";
 
 import { authSlice } from "../../redux/auth/authReducer";
-const { updateUserInfo } = authSlice.actions;
 import { handleLike, handleFavorite } from "../../firebase/operations";
 
 import { Divider } from "@rneui/themed";
@@ -31,21 +30,17 @@ const Post = ({ post, navigation, favoriteData, route }) => {
     liked_users,
   } = post;
 
-  const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
+  const isFocused = useIsFocused();
+
   const currenUser = useSelector((state) => state.auth.owner_uid);
   const currentUserId = useSelector((state) => state.auth.email);
+
+  const [likes, setLikes] = useState(liked_users.length > 0 ? liked_users : []);
   const [comments, setComments] = useState([]);
-  const isFocused = useIsFocused();
+
   useEffect(() => {
     const fetchComments = async (email, postIdTemp) => {
-      const q = query(
-        collection(fsbase, `users/${email}/posts/${postIdTemp}/comments`)
-      );
-      const snapshot = await getDocs(q);
-      const newComments = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        commentIdTemp: doc.id,
-      }));
+      const newComments = await getCommentsOnly(email, postIdTemp);
       if (newComments.length !== comments.length) {
         setComments(newComments);
       }
@@ -122,6 +117,7 @@ const PostHeader = ({ profile_picture, user, navigation, userEmail }) => {
 
 const PostImage = ({ postImage }) => {
   const [dimensions, setdimensions] = useState(Dimensions.get("window").width);
+
   useEffect(() => {
     const onChange = () => {
       const width = Dimensions.get("window").width - 20 * 2;
@@ -151,16 +147,17 @@ const PostFooter = ({
   favorites,
   currentUserId,
 }) => {
-  const [loading, setLoading] = useState(false);
+  const { postIdTemp, email, postId } = post;
+
+  const dispatch = useDispatch();
   const isFocused = useIsFocused();
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (isFocused) {
       const fetchLikes = async (email, postIdTemp) => {
-        const dbRef = doc(fsbase, `users/${email}/posts/${postIdTemp}/`);
-        const userDetails = await getDoc(dbRef);
-        const currentData = userDetails.data();
-        const lastFetchedLikes = currentData.liked_users;
+        const lastFetchedLikes = await getLikes(email, postIdTemp);
         if (lastFetchedLikes.length !== likes.length) {
           setLikes(lastFetchedLikes);
         }
@@ -181,13 +178,6 @@ const PostFooter = ({
     }, 2000);
   };
 
-  const { postIdTemp, email, postId } = post;
-  const dispatch = useDispatch();
-  const check = (likes) => {
-    return !likes.includes(currenUser)
-      ? postFooterIcons[0].image
-      : postFooterIcons[0].imageActive;
-  };
   return (
     <View style={{ flexDirection: "row", marginBottom: 5 }}>
       <View style={styles.postFooterLeftContainer}>
@@ -233,6 +223,7 @@ const PostFooter = ({
         <TouchableOpacity
           style={{ height: 25, width: 25 }}
           onPress={async () => {
+            const { updateUserInfo } = authSlice.actions;
             const updatedFavorites = await handleFavorite(
               postId,
               currentUserId

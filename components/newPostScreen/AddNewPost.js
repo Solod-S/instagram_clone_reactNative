@@ -1,9 +1,11 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useState } from "react";
+
 import FormikPostUploader from "./FormikPostUploader";
 
 const AddNewPost = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} loading={loading} />

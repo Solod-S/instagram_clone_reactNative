@@ -9,10 +9,11 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { useRef, useEffect, useState } from "react";
-import { Divider } from "@rneui/themed";
 
 import FormikCommentUploader from "./FormikCommentUploader";
-import { CommentSkeleton } from "../shared/Skeleton";
+import CommentSkeleton from "../shared/skeletons/CommentSkeleton";
+
+import { Divider } from "@rneui/themed";
 
 const AddNewComment = ({
   navigation,
@@ -101,17 +102,7 @@ const Header = ({ navigation }) => {
 };
 
 const About = ({ post, navigation }) => {
-  const {
-    caption,
-    user,
-    owner_uid,
-    time,
-    date,
-    postIdTemp,
-    userIdTemp,
-    profile_picture,
-    email,
-  } = post;
+  const { caption, user, time, date, profile_picture, email } = post;
 
   return (
     <View

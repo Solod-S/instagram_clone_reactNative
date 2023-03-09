@@ -2,33 +2,22 @@ import { SafeAreaView } from "react-native";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { fsbase } from "../../../firebase/firebase";
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-import {
-  getDocs,
-  getDoc,
-  updateDoc,
-  getFirestore,
-  query,
-  collection,
-} from "firebase/firestore";
+import getNotificationWithStatusChange from "../../../firebase/operations/getNotificationWithStatusChange";
 
-import fetchNotification from "../../../firebase/operations/fetchNotification";
-
-import { NotificationSkeleton } from "../../../components/shared/Skeleton";
 import Header from "../../../components/NotificationScreen/Header";
-import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 import Journal from "../../../components/NotificationScreen/Journal";
+import NotificationSkeleton from "../../../components/shared/skeletons/NotificationSkeleton";
+import SafeViewAndroid from "../../../components/shared/SafeViewAndroid";
 
 const NotificationScreen = ({ navigation }) => {
+  const { email } = useSelector((state) => state.auth);
+
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState([]);
-  const { email } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const fetchData = async () => {
-      const notification = await fetchNotification(email);
+      const notification = await getNotificationWithStatusChange(email);
       setNotification(notification.sort((a, b) => a.created < b.created));
       setIsLoading(false);
     };
@@ -39,6 +28,7 @@ const NotificationScreen = ({ navigation }) => {
       console.log(`NotificationScreen.error`, error.message);
     }
   }, []);
+
   return (
     <SafeAreaView
       style={{

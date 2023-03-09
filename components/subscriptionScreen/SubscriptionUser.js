@@ -2,16 +2,18 @@ import { View, Image, TouchableOpacity, Text } from "react-native";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { Ionicons } from "@expo/vector-icons";
-
 import { authSlice } from "../../redux/auth/authReducer";
 import handleSubscribe from "../../firebase/operations/handleSubscribe";
 
+import { Ionicons } from "@expo/vector-icons";
+
 const SubscriptionUser = ({ user, setUsers, email, navigation, userEmail }) => {
-  const [loading, setloading] = useState(false);
-  const { updateUserInfo } = authSlice.actions;
   const dispatch = useDispatch();
+
+  const [loading, setloading] = useState(false);
+
   const onSubscribe = async () => {
+    const { updateUserInfo } = authSlice.actions;
     const result = await handleSubscribe(email, user.email);
     dispatch(updateUserInfo({ subscribe_list: result }));
   };

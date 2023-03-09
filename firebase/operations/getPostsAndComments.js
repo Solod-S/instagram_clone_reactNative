@@ -1,14 +1,8 @@
 //DON'T USE THIS!!!!!
 import { fsbase } from "../firebase/firebase";
-import {
-  collection,
-  collectionGroup,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 
-const handlePostsAndComments = async () => {
+const getPostsAndComments = async () => {
   const q = query(collection(fsbase, "users"));
   const snapshot = await getDocs(q);
   const users = snapshot.docs.map((doc) => ({

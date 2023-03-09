@@ -1,30 +1,25 @@
-import { SafeAreaView, ScrollView, View, Text, Image } from "react-native";
-import { useEffect, useState, useLayoutEffect } from "react";
+import { SafeAreaView, ScrollView, RefreshControl } from "react-native";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { fsbase } from "../../firebase/firebase";
-import {
-  collectionGroup,
-  query,
-  getDocs,
-  doc,
-  getDoc,
-  where,
-} from "firebase/firestore";
+import getPostsByEmail from "../../firebase/operations/getPostsByEmail";
 
-import { authSlice } from "../../redux/auth/authReducer";
-import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
-import getAvatar from "../../firebase/operations/getAvatar";
+import {
+  stopUpdatingApp,
+  startUpdatingApp,
+} from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import { PostsSkeleton } from "../../components/shared/Skeleton";
-import UserInfo from "../../components/profile/UserInfo";
-import UserInfoEditor from "../../components/profile/UserInfoEditor";
+import PostsSkeleton from "../../components/shared/skeletons/PostsSkeleton";
+import UserInfo from "../../components/profileScreen/UserInfo";
+import UserInfoEditor from "../../components/profileScreen/UserInfoEditor";
+import MyPostsEmptyPlaceHolder from "../../components/profileScreen/MyPostsEmptyPlaceHolder";
 
 const ProfileScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
+
   const {
     email,
     username,
@@ -35,27 +30,11 @@ const ProfileScreen = ({ navigation }) => {
   } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
 
+  const [refreshing, setRefreshing] = useState(false);
   const [editorMode, seteditorMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState(favorite ? favorite : []);
-
-  const dispatch = useDispatch();
-
-  useLayoutEffect(() => {
-    const fetchUserData = async () => {
-      const { updateUserInfo } = authSlice.actions;
-      const dbRef = doc(fsbase, `users/${email}`);
-      const userDetails = await getDoc(dbRef);
-      const currentData = userDetails.data();
-    };
-
-    try {
-      fetchUserData();
-    } catch (error) {
-      console.log(`fetchFavorite.error`, error.message);
-    }
-  }, []);
 
   useEffect(() => {
     setFavorites(favorite);
@@ -63,19 +42,7 @@ const ProfileScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const def_avatar = await getAvatar("default");
-      const photoUri = await getAvatar("user", email);
-
-      const q = query(
-        collectionGroup(fsbase, "posts"),
-        where("email", "==", email)
-      );
-      const snapshot = await getDocs(q);
-      const posts = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        postIdTemp: doc.id,
-        profile_picture: photoUri ? photoUri : def_avatar,
-      }));
+      const posts = await getPostsByEmail(email);
       setIsLoading(false);
       setPosts(posts);
     };
@@ -85,9 +52,19 @@ const ProfileScreen = ({ navigation }) => {
     } catch (error) {
       console.log(`fetchPosts.error`, error.message);
     } finally {
-      dispatch(stopUpdatingApp());
+      if (status === true) {
+        dispatch(stopUpdatingApp());
+      }
     }
   }, [status === true]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(startUpdatingApp());
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView
@@ -122,33 +99,16 @@ const ProfileScreen = ({ navigation }) => {
           navigation={navigation}
         />
       )}
-      {isLoading && (
-        <>
-          <PostsSkeleton />
-        </>
-      )}
-
-      {posts.length <= 0 && !isLoading && (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../assets/icons/posts-empty.png")}
-              style={{ width: 200, height: 200, marginBottom: 10 }}
-            />
-            <Text style={{ color: "white" }}>You don't have any posts..</Text>
-          </View>
-        </>
-      )}
-
-      {!isLoading && posts.length > 0 && (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          {posts
+      {isLoading && <PostsSkeleton />}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {!isLoading &&
+          posts.length > 0 &&
+          posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
               <Post
@@ -159,8 +119,8 @@ const ProfileScreen = ({ navigation }) => {
                 setFavorites={setFavorites}
               />
             ))}
-        </ScrollView>
-      )}
+      </ScrollView>
+      {posts.length <= 0 && !isLoading && <MyPostsEmptyPlaceHolder />}
     </SafeAreaView>
   );
 };

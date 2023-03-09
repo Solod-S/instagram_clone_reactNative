@@ -1,21 +1,12 @@
-import { Text, View, Image, TextInput, TouchableOpacity } from "react-native";
-import { Divider } from "@rneui/themed";
+import { Text, View, TextInput, TouchableOpacity } from "react-native";
+import { useSelector } from "react-redux";
+
 import { Formik } from "formik";
 import * as yup from "yup";
-import { useSelector, useDispatch } from "react-redux";
 
-import {
-  stopUpdatingApp,
-  startUpdatingApp,
-} from "../../redux/auth/appUpdateSlice";
+import handleComment from "../../firebase/operations/handleComment";
 
-import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
-import { fsbase } from "../../firebase/firebase";
-import "firebase/compat/firestore";
-import { addDoc, collection } from "firebase/firestore";
-
-import handleNotification from "../../firebase/operations/handleNotification";
+import { Divider } from "@rneui/themed";
 
 const uploadCommentSchema = yup.object().shape({
   message: yup
@@ -31,12 +22,10 @@ const FormikCommentUploader = ({
   setComments,
   keyboardHide,
 }) => {
-  const { status } = useSelector((state) => state.appUpdate);
-  const dispatch = useDispatch();
   const { owner_uid, profile_picture, username, email } = useSelector(
     (state) => state.auth
   );
-  const handComments = async (
+  const makeComment = async (
     userId,
     postId,
     comment,
@@ -45,51 +34,16 @@ const FormikCommentUploader = ({
     username,
     email
   ) => {
-    const date = new Date().toLocaleDateString();
-    const time = new Date()
-      .toLocaleTimeString()
-      .split(":")
-      .splice(0, 2)
-      .join(":");
-    const created = Date.now().toString();
-    const commentId = uuidv4();
-    await addDoc(
-      collection(fsbase, `users/${userId}/posts/${postId}/comments/`),
-      {
-        comment,
-        commentId,
-        created,
-        time,
-        date,
-        owner_uid,
-        profile_picture,
-        user: username,
-        email,
-      }
-    );
-    handleNotification(
+    const newComment = await handleComment(
       userId,
-      {
-        userEmail: email,
-        postId: postId,
-      },
-      "commentAction"
+      postId,
+      comment,
+      owner_uid,
+      profile_picture,
+      username,
+      email
     );
-
-    setComments((prevState) => [
-      ...prevState,
-      {
-        comment,
-        commentId,
-        created,
-        time,
-        date,
-        owner_uid,
-        profile_picture,
-        user: username,
-        email,
-      },
-    ]);
+    setComments((prevState) => [...prevState, newComment]);
   };
 
   return (
@@ -98,7 +52,7 @@ const FormikCommentUploader = ({
       onSubmit={async (values, actions) => {
         const { message } = values;
         try {
-          await handComments(
+          await makeComment(
             userIdTemp,
             postIdTemp,
             message,
@@ -111,7 +65,7 @@ const FormikCommentUploader = ({
           actions.resetForm();
           keyboardHide();
         } catch (error) {
-          console.log(`handComments.error`, error.message);
+          console.log(`makeComment.error`, error.message);
         }
       }}
       validationSchema={uploadCommentSchema}

@@ -4,24 +4,20 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
-  ScrollView,
   Dimensions,
   Keyboard,
 } from "react-native";
-import { Divider } from "@rneui/themed";
+import * as ImagePicker from "expo-image-picker";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+
 import { Formik } from "formik";
 import * as yup from "yup";
-import * as ImagePicker from "expo-image-picker";
-import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
 
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
-import { fsbase } from "../../firebase/firebase";
-
+import handlePost from "../../firebase/operations/handlePost";
 import { startUpdatingApp } from "../../redux/auth/appUpdateSlice";
+
+import { Divider } from "@rneui/themed";
 
 const PLACEHOLDERIMG =
   "https://www.shorekids.co.nz/wp-content/uploads/2014/08/ig-placeholder-500.jpg";
@@ -35,9 +31,7 @@ const uploadPostSchema = yup.object().shape({
 
 const FormikPostUploader = ({ navigation, setLoading, loading }) => {
   const dispatch = useDispatch();
-  const { owner_uid, username, email, profile_picture } = useSelector(
-    (state) => state.auth
-  );
+  const { owner_uid, username, email } = useSelector((state) => state.auth);
 
   const [dimensions, setdimensions] = useState(
     Dimensions.get("window").width - 10 * 2
@@ -72,29 +66,7 @@ const FormikPostUploader = ({ navigation, setLoading, loading }) => {
     };
   }, []);
 
-  const uploadPhotoToServer = async () => {
-    const storage = getStorage();
-    const uniquePostId = uuidv4();
-    const storageRef = ref(storage, `photos/${uniquePostId}`);
-
-    const response = await fetch(postImage);
-    const file = await response.blob();
-
-    await uploadBytes(storageRef, file).then(() => {});
-
-    const processedPhoto = await getDownloadURL(
-      ref(storage, `photos/${uniquePostId}`)
-    )
-      .then((url) => {
-        return url;
-      })
-      .catch((error) => {
-        console.log(`error.processedPhoto`, error.message);
-      });
-    return processedPhoto;
-  };
-
-  const imageHander = async () => {
+  const imageHandler = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -107,36 +79,17 @@ const FormikPostUploader = ({ navigation, setLoading, loading }) => {
         setPostImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.log("error.imageHander", error.message);
+      console.log("error.imageHandler", error.message);
     }
   };
 
   const uploadPostToServer = async (caption) => {
-    try {
-      const postPhoto = await uploadPhotoToServer();
-      const uniquePostId = uuidv4();
-      const date = new Date().toLocaleDateString();
-      const time = new Date()
-        .toLocaleTimeString()
-        .split(":")
-        .splice(0, 2)
-        .join(":");
-      const created = Date.now().toString();
-      await addDoc(collection(fsbase, `users/${email}/posts/`), {
-        caption,
-        created,
-        date,
-        time,
-        likes: 0,
-        liked_users: [],
-        postImage,
-        profile_picture,
-        user: username,
-        email,
-        owner_uid,
-        postId: uniquePostId,
-      });
+    const makePost = async (caption, postImage, email, username, owner_uid) => {
+      await handlePost(caption, postImage, email, username, owner_uid);
       dispatch(startUpdatingApp());
+    };
+    try {
+      makePost(caption, postImage, email, username, owner_uid);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -158,7 +111,9 @@ const FormikPostUploader = ({ navigation, setLoading, loading }) => {
           if (loading) {
             return;
           }
+
           setLoading(true);
+
           await uploadPostToServer(values.caption);
           setPostImage("");
 
@@ -189,7 +144,7 @@ const FormikPostUploader = ({ navigation, setLoading, loading }) => {
             >
               <TouchableOpacity
                 activeOpacity={0.6}
-                onPress={imageHander}
+                onPress={imageHandler}
                 style={{ marginBottom: 10 }}
               >
                 <Image

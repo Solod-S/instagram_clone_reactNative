@@ -6,22 +6,21 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
-import { MaterialIcons } from "@expo/vector-icons";
+import getStories from "../../firebase/operations/getStories";
 
-import fetchStories from "../../firebase/operations/fetchStories";
-import { StoriesSkeleton } from "../shared/Skeleton";
+import { MaterialIcons } from "@expo/vector-icons";
+import StoriesSkeleton from "../shared/skeletons/StoriesSkeleton";
 
 const Stories = ({ navigation }) => {
-  const { profile_picture, email, subscribe_list } = useSelector(
+  const { profile_picture, subscribe_list } = useSelector(
     (state) => state.auth
   );
   const { status } = useSelector((state) => state.appUpdate);
-  const isFocused = useIsFocused();
+  // const isFocused = useIsFocused();
   const [loading, setloading] = useState(false);
   const [stories, setStories] = useState([]);
 
@@ -31,7 +30,7 @@ const Stories = ({ navigation }) => {
         setloading(false);
         return;
       }
-      const stories = await fetchStories(subscribe_list);
+      const stories = await getStories(subscribe_list);
       setStories(stories);
       setloading(false);
     };
@@ -40,7 +39,7 @@ const Stories = ({ navigation }) => {
       setloading(true);
       fetchData(subscribe_list);
     } catch (error) {}
-  }, [subscribe_list, isFocused, status === true]);
+  }, [subscribe_list, status === true]);
 
   const openNewStoriesScreen = () => {
     setloading(true);
@@ -83,7 +82,7 @@ const Stories = ({ navigation }) => {
               style={styles.myStoryImg}
             />
           </View>
-          <Text style={styles.storyName}>Your story</Text>
+          <Text style={styles.storyName}>Add story</Text>
         </TouchableOpacity>
         {loading && <StoriesSkeleton />}
         {stories.length > 0 &&

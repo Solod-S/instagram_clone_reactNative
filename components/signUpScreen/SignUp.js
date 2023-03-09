@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+
 import { Formik } from "formik";
 import * as yup from "yup";
 import { validate } from "email-validator";
@@ -27,8 +28,9 @@ const SignupFormSchema = yup.object().shape({
 });
 
 const SignupForm = ({ navigation }) => {
-  const [showPass, setShowPass] = useState(false);
   const dispatch = useDispatch();
+
+  const [showPass, setShowPass] = useState(false);
 
   const toglePass = () => {
     setShowPass(!showPass);

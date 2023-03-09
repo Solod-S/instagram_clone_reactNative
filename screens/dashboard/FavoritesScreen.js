@@ -1,74 +1,39 @@
-import {
-  SafeAreaView,
-  FlatList,
-  StyleSheet,
-  Image,
-  Text,
-  View,
-} from "react-native";
-import { useEffect, useState } from "react";
+import { SafeAreaView, FlatList, RefreshControl } from "react-native";
+import { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { fsbase } from "../../firebase/firebase";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import {
-  collectionGroup,
-  query,
-  getDocs,
-  doc,
-  getDoc,
-  where,
-} from "firebase/firestore";
+import getFavoritePost from "../../firebase/operations/getFavoritePost";
 
-import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
-import getAvatar from "../../firebase/operations/getAvatar";
+import {
+  stopUpdatingApp,
+  startUpdatingApp,
+} from "../../redux/auth/appUpdateSlice";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
 import Header from "../../components/shared/Header";
 import Post from "../../components/shared/Post";
-import { PostsSkeleton } from "../../components/shared/Skeleton";
+import PostsSkeleton from "../../components/shared/skeletons/PostsSkeleton";
+import FavoritesEmptyPlaceHolder from "../../components/favoritesScreen/FavoritesEmptyPlaceHolder";
 
 const FavoritesScreen = ({ navigation }) => {
-  const { email, favorite, subscribe_list, user_about, profile_picture } =
-    useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  const { favorite } = useSelector((state) => state.auth);
   const { status } = useSelector((state) => state.appUpdate);
 
+  const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState([]);
   const [favorites, setFavorites] = useState(favorite ? favorite : []);
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     setFavorites(favorite);
   }, [favorite]);
 
   useEffect(() => {
-    const fetchFavoritePost = async (id) => {
-      const def_avatar = await getAvatar("default");
-      const postsCollection = collectionGroup(fsbase, "posts");
-      const q = query(postsCollection, where("postId", "==", id));
-
-      const snapshot = await getDocs(q);
-      const posts = await Promise.all(
-        snapshot.docs.map(async (doc) => {
-          const userData = doc.data();
-          const photoUri = await getAvatar("user", userData.email);
-
-          return {
-            ...doc.data(),
-            postIdTemp: doc.id,
-            profile_picture: photoUri ? photoUri : def_avatar,
-          };
-        })
-      );
-
-      return posts[0];
-    };
-
     const handleFavoritesCollection = async () => {
       const favoriteList = await Promise.all(
-        favorites.map(async (favorite) => await fetchFavoritePost(favorite))
+        favorites.map(async (favorite) => await getFavoritePost(favorite))
       );
 
       setPosts(favoriteList.sort((a, b) => a.created < b.created));
@@ -81,11 +46,21 @@ const FavoritesScreen = ({ navigation }) => {
     } catch (error) {
       console.log(`handleFavoritesCollection.error`, error.message);
     } finally {
-      dispatch(stopUpdatingApp());
+      if (status === true) {
+        dispatch(stopUpdatingApp());
+      }
     }
-  }, [favorites]);
+  }, [favorites, status === true]);
 
   const keyExtractor = (item) => item?.postId;
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(startUpdatingApp());
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <SafeAreaView
@@ -95,11 +70,12 @@ const FavoritesScreen = ({ navigation }) => {
       }}
     >
       <Header navigation={navigation} />
-
       {isLoading && <PostsSkeleton />}
-
       {posts.length > 0 && !isLoading && (
         <FlatList
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           data={posts}
           initialNumToRender={4}
           showsVerticalScrollIndicator={false}
@@ -118,36 +94,10 @@ const FavoritesScreen = ({ navigation }) => {
         />
       )}
       {favorites.length <= 0 && posts.length <= 0 && !isLoading && (
-        <>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Image
-              source={require("../../assets/icons/favorites-empty.png")}
-              style={{ width: 200, height: 200, marginBottom: 10 }}
-            />
-            <Text style={{ color: "white" }}>
-              You don't have any favorite posts..
-            </Text>
-          </View>
-        </>
+        <FavoritesEmptyPlaceHolder />
       )}
     </SafeAreaView>
   );
 };
 
 export default FavoritesScreen;
-
-const styles = StyleSheet.create({
-  lottie: {
-    width: 400,
-    height: 400,
-    zIndex: -1,
-    // height: "80%",
-    // backgroundColor: "black",
-  },
-});

@@ -9,6 +9,7 @@ const BottomTabs = ({ navigation, pageName }) => {
   const { profile_picture } = useSelector((state) => state.auth);
 
   const [activeTab, setaAtiveTab] = useState("");
+
   useEffect(() => {
     setaAtiveTab(pageName);
   }, [pageName]);

@@ -1,4 +1,5 @@
 import { Image, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Divider } from "@rneui/themed";
 import { useState } from "react";

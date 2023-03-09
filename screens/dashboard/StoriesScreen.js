@@ -177,7 +177,7 @@ function StoriesScreen({ navigation, route }) {
             source={{
               uri: content[current].content,
             }}
-            style={{ width: width, height: height, resizeMode: "cover" }}
+            style={{ width: width, height: height, resizeMode: "contain" }}
           />
         )}
       </View>

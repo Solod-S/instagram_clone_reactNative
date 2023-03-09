@@ -2,10 +2,10 @@ import { StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavigationContainer } from "@react-navigation/native";
-import AnimatedLoader from "react-native-animated-loader";
 
-import { fsbase } from "../firebase/firebase";
-import { getDoc, doc } from "firebase/firestore";
+import getUserInfo from "../firebase/operations/getUserInfo";
+
+import AnimatedLoader from "react-native-animated-loader";
 
 import { authSlice } from "../redux/auth/authReducer";
 import { authStateChangeUsers } from "../redux/auth/authOperation";
@@ -19,9 +19,7 @@ const MainRouter = () => {
   useEffect(() => {
     const updateUserData = async () => {
       const { updateUserInfo } = authSlice.actions;
-      const dbRef = doc(fsbase, `users/${email}`);
-      const userDetails = await getDoc(dbRef);
-      const currentData = userDetails.data();
+      const currentData = await getUserInfo(email);
       if (currentData) {
         const { user_about, subscribe_list, favorite } = currentData;
         dispatch(updateUserInfo({ user_about, subscribe_list, favorite }));
