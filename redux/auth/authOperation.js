@@ -1,60 +1,21 @@
 import { Alert } from "react-native";
 import {
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  updateProfile,
   onAuthStateChanged,
   signOut,
   sendPasswordResetEmail,
-  getAuth,
-  getDoc,
 } from "firebase/auth";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth } from "../../firebase/firebase";
-import { fsbase } from "../../firebase/firebase";
-import { collection, addDoc, doc, setDoc } from "firebase/firestore";
 import { authSlice } from "./authReducer";
-const { updateUserProfile, authStateChange, authSignOut, updateUserInfo } =
-  authSlice.actions;
-import getAvatar from "../../firebase/operations/getAvatar";
+const { authStateChange, authSignOut, updateUserInfo } = authSlice.actions;
 
-const getRandomProfilePicture = async () => {
-  const response = await fetch(
-    "https://randomuser.me/api/0.4/?lego&randomapi&results=1"
-  );
-  const data = await response.json();
-
-  return data.results[0].user.picture;
-};
+import handleNewUser from "../../firebase/operations/handleNewUser";
 
 export const authSignUpUser =
   ({ login, email, password, profile_picture }) =>
   async (dispatch) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // const randomPhoto = await getRandomProfilePicture();
-
-      const storage = getStorage();
-      const photoUri = await getAvatar("default");
-      // const photo = await uploadPhotoToServer(avatar, email);
-      await updateProfile(auth.currentUser, {
-        displayName: login,
-        photoURL: photoUri,
-      });
-
-      const { uid, displayName, photoURL } = auth.currentUser;
-
-      // await addDoc(collection(fsbase, "users"), {
-      await setDoc(doc(fsbase, "users", email), {
-        owner_uid: uid,
-        login: login,
-        email: email,
-        profile_picture: photoUri,
-        subscribe_list: [email],
-        favorite: [],
-        subscription: "starter",
-        user_about: "",
-      });
+      const { uid, photoUri } = await handleNewUser(login, email, password);
 
       dispatch(
         updateUserInfo({
@@ -133,7 +94,6 @@ export const authSignOutUser = () => async (dispatch, getState) => {
 
 export const authStateChangeUsers = () => async (dispatch) => {
   onAuthStateChanged(auth, (user) => {
-    // console.log(`authStateChangeUsers displayName`, user.displayName);
     try {
       if (user) {
         const userUpdateProfile = {

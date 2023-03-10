@@ -43,7 +43,9 @@ const MainRouter = () => {
       <AnimatedLoader
         visible={loading}
         overlayColor="rgba(255,255,255,0.75)"
-        // source={require("./assets/animation/phone_loader.json")}
+        // source={
+        //   (require("./../assets/animation/phone_loader.json"))
+        // }
         source={{
           uri: "https://assets9.lottiefiles.com/packages/lf20_ujvyzbbd.json",
         }}

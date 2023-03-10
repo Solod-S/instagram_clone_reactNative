@@ -33,7 +33,7 @@ const UserInfoEditor = ({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [1, 1],
-        quality: 1,
+        quality: 0.4,
       });
 
       if (!result.canceled) {

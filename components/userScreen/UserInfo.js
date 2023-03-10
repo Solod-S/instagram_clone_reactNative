@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
 import getUserInfo from "../../firebase/operations/getUserInfo";
+import handleSubscribe from "../../firebase/operations/handleSubscribe";
 import { authSlice } from "../../redux/auth/authReducer";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -26,7 +27,7 @@ const UserInfo = ({
 
   useEffect(() => {
     if (isFocused) {
-      const handleSubscribe = async (userEmail) => {
+      const fetchSubscribe = async (userEmail) => {
         const userDetails = await getUserInfo(userEmail);
 
         if (userDetails.subscribe_list.length !== subscribe.length) {
@@ -35,9 +36,9 @@ const UserInfo = ({
       };
 
       try {
-        handleSubscribe(userEmail);
+        fetchSubscribe(userEmail);
       } catch (error) {
-        console.log(`handleSubscribe.error`, error.message);
+        console.log(`fetchSubscribe.error`, error.message);
       }
     }
   }, [isFocused]);

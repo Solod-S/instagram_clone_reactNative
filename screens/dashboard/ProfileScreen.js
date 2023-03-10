@@ -100,15 +100,14 @@ const ProfileScreen = ({ navigation }) => {
         />
       )}
       {isLoading && <PostsSkeleton />}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {!isLoading &&
-          posts.length > 0 &&
-          posts
+      {!isLoading && posts.length > 0 && (
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {posts
             .sort((a, b) => a.created < b.created)
             .map((post) => (
               <Post
@@ -119,7 +118,8 @@ const ProfileScreen = ({ navigation }) => {
                 setFavorites={setFavorites}
               />
             ))}
-      </ScrollView>
+        </ScrollView>
+      )}
       {posts.length <= 0 && !isLoading && <MyPostsEmptyPlaceHolder />}
     </SafeAreaView>
   );

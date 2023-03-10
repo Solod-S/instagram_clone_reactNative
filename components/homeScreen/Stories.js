@@ -7,38 +7,50 @@ import {
   ScrollView,
 } from "react-native";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useIsFocused } from "@react-navigation/native";
 
 import getStories from "../../firebase/operations/getStories";
+import { stopUpdatingApp } from "../../redux/auth/appUpdateSlice";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import StoriesSkeleton from "../shared/skeletons/StoriesSkeleton";
 
 const Stories = ({ navigation }) => {
-  const { profile_picture, subscribe_list } = useSelector(
+  // const isFocused = useIsFocused();
+  const dispatch = useDispatch();
+
+  const { profile_picture, subscribe_list, email } = useSelector(
     (state) => state.auth
   );
   const { status } = useSelector((state) => state.appUpdate);
-  // const isFocused = useIsFocused();
+
   const [loading, setloading] = useState(false);
   const [stories, setStories] = useState([]);
 
   useEffect(() => {
     const fetchData = async (subscribe_list) => {
-      if (subscribe_list.length <= 0) {
-        setloading(false);
-        return;
+      const newList = [...subscribe_list];
+      if (!newList.includes(email)) {
+        newList.push(email);
       }
-      const stories = await getStories(subscribe_list);
-      setStories(stories);
-      setloading(false);
+      setTimeout(async () => {
+        const stories = await getStories(newList);
+        setStories(stories);
+        setloading(false);
+      }, 2000);
     };
 
     try {
       setloading(true);
       fetchData(subscribe_list);
-    } catch (error) {}
+    } catch (error) {
+      console.log("getStories.error".error.message);
+    } finally {
+      if (status === true) {
+        dispatch(stopUpdatingApp());
+      }
+    }
   }, [subscribe_list, status === true]);
 
   const openNewStoriesScreen = () => {

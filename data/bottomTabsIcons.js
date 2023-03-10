@@ -23,15 +23,11 @@ export const bottomTabIcons = [
     inactive: require("../assets/icons/shop_inactive.png"),
     link: "",
   },
-  // {
-  //   name: "Profile",
-  //   active: require("../assets/icons/ava.jpg"),
-  //   inactive: require("../assets/icons/ava.jpg"),
-  // },
+
   {
     name: "Profile",
-    active: require("../assets/icons/ava.jpg"),
-    inactive: require("../assets/icons/ava.jpg"),
+    active: require("../assets/icons/instagram-default-profile-picture.png"),
+    inactive: require("../assets/icons/instagram-default-profile-picture.png"),
     link: "ProfileScreen",
   },
 ];

@@ -21,7 +21,7 @@ const getStories = async (subscribe_list) => {
   const allData = await Promise.all(
     subscribe_list.map(async (item) => {
       const userData = await getUserInfo(item);
-      // console.log(userData);
+
       return {
         email: item,
         avatar: userData.profile_picture,
