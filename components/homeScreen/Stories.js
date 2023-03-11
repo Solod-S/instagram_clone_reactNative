@@ -32,13 +32,12 @@ const Stories = ({ navigation }) => {
     const fetchData = async (subscribe_list) => {
       const newList = [...subscribe_list];
       if (!newList.includes(email)) {
-        newList.push(email);
+        newList.unshift(email);
       }
-      setTimeout(async () => {
-        const stories = await getStories(newList);
-        setStories(stories);
-        setloading(false);
-      }, 2000);
+
+      const stories = await getStories(newList);
+      setStories(stories);
+      setloading(false);
     };
 
     try {

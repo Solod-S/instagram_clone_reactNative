@@ -21,7 +21,9 @@ const getStories = async (subscribe_list) => {
   const allData = await Promise.all(
     subscribe_list.map(async (item) => {
       const userData = await getUserInfo(item);
-
+      if (!userData) {
+        return;
+      }
       return {
         email: item,
         avatar: userData.profile_picture,
@@ -33,7 +35,7 @@ const getStories = async (subscribe_list) => {
     })
   );
 
-  return allData.filter((item) => item.data.length > 0);
+  return allData.filter((item) => item && item.data.length > 0);
 };
 
 export default getStories;

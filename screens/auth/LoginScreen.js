@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native";
 import { useState, useEffect } from "react";
 
 import SafeViewAndroid from "../../components/shared/SafeViewAndroid";
-import LoginForm from "../../components/loginScreen/LoginForm";
+import LoginForm from "../../components/loginScreen/loginForm";
 
 const LoginScreen = ({ navigation }) => {
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);

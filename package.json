@@ -20,7 +20,7 @@
     "elements": "^0.6.0",
     "email-validator": "^2.0.4",
     "expo": "~47.0.12",
-    "expo-av": "^13.2.1",
+    "expo-av": "~13.0.3",
     "expo-camera": "^13.1.0",
     "expo-font": "^11.0.1",
     "expo-image-picker": "^14.0.2",
@@ -37,6 +37,7 @@
     "react-native": "0.70.5",
     "react-native-animated-loader": "^1.0.0",
     "react-native-async-storage": "^0.0.1",
+    "react-native-dotenv": "^3.4.8",
     "react-native-easy-content-loader": "^0.3.2",
     "react-native-gesture-handler": "^2.8.0",
     "react-native-get-random-values": "^1.8.0",
@@ -44,10 +45,22 @@
     "react-native-screens": "^3.18.0",
     "react-redux": "^8.0.5",
     "uuid": "^9.0.0",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "expo-updates": "~0.15.6"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Solod-S/instagram_clone_reactNative.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Solod-S/instagram_clone_reactNative/issues"
+  },
+  "homepage": "https://github.com/Solod-S/instagram_clone_reactNative#readme",
+  "description": ""
 }

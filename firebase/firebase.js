@@ -1,4 +1,5 @@
 // Import the functions you need from the SDKs you need
+import { API_KEY } from "@env";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import "firebase/storage";
 import "firebase/firestore";
@@ -15,7 +16,7 @@ import { getFirestore } from "firebase/firestore";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBLXnU-SAm-yU7X5yxCU2CI6YgI_HLphyU",
+  apiKey: API_KEY,
   authDomain: "instagram-clone-b03b9.firebaseapp.com",
   projectId: "instagram-clone-b03b9",
   storageBucket: "instagram-clone-b03b9.appspot.com",
