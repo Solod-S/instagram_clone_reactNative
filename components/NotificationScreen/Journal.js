@@ -59,7 +59,11 @@ const NotificationItem = ({ notification, navigation }) => {
       <View style={styles.postImg}>
         {postId && (
           <TouchableOpacity
-            onPress={() => navigation.push("PostScreen", { post })}
+            onPress={() =>
+              navigation.push("PostScreen", {
+                post: { ...post, profile_picture },
+              })
+            }
           >
             <Image style={styles.postImag} source={{ uri: post.postImage }} />
           </TouchableOpacity>
