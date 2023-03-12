@@ -23,7 +23,7 @@ export const authSignUpUser =
           username: login,
           email,
           profile_picture: photoUri,
-          subscribe_list: [email],
+          subscribe_list: [],
           favorite: [],
           user_about: "",
         })
