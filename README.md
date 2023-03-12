@@ -30,9 +30,15 @@
 
 ![alt text](assets/about/background.jpg "Title")
 
-This project is a clone of the Instagram android app. I tested it on an android smartphone and an android emulator, it may work on iPhone (but I didn't test it).
+Introducing my pet project, an Instagram clone powered by React Native, Redux, Firebase, and Expo CLI. This app is a personal project that I am pursuing out of my passion for mobile app development and social media.
 
-It's made using React Native, Expo CLI, Firebase services (authentication, firestore and storage), and Redux.
+The app is built using React Native, which allows for the creation of high-performance native mobile apps for both iOS and Android. The state management of the app is handled using Redux, which makes it easy to manage the application state and keep the codebase scalable and maintainable.
+
+The backend of the app is powered by Firebase, a comprehensive backend platform that provides a range of services for mobile and web apps. Firebase provides features such as authentication, real-time database, storage, all of which are essential for the functioning of a social media app.
+
+Finally, Expo CLI is used to build, test, and deploy the app. Expo CLI is a toolchain built around React Native, which makes it easy to develop, test, and deploy apps for iOS and Android with just one codebase. To test the app, I have used Android devices as I haven't tested it on iOS yet.
+
+Overall, this pet project is an opportunity for me to sharpen my skills in mobile app development while creating a clone of one of the most popular social media platforms in the world.
 
 ## 🆕 Getting Started
 
