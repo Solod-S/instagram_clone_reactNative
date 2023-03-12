@@ -30,9 +30,9 @@
 
 ![alt text](assets/about/background.jpg "Title")
 
-This project is a clone of the Instagram android app. I tested it on android smartphone and android emulator, it's may work on iphone (but i didn't test it).
+This project is a clone of the Instagram android app. I tested it on an android smartphone and an android emulator, it may work on iPhone (but I didn't test it).
 
-It's made using React Native, Expo CLI, Firebase services (authentication, firestore and storage) and Redux.
+It's made using React Native, Expo CLI, Firebase services (authentication, firestore and storage), and Redux.
 
 ## 🆕 Getting Started
 
